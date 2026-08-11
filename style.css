@@ -1,0 +1,169 @@
+/* Early 2000s Windows-era Thin CSS */
+body {
+    font-family: Tahoma, "Trebuchet MS", Arial, sans-serif;
+    background-color: #d4d0c8; /* Classic Windows 98/2000 Gray */
+    color: #000;
+    margin: 0;
+    padding: 15px;
+}
+
+.header {
+    background-color: #000080;
+    color: #ffffff;
+    padding: 12px;
+    border: 2px outset #ffffff;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.header p {
+    margin: 5px 0 0 0;
+    font-size: 12px;
+}
+
+.nav-bar {
+    background-color: #c0c0c0;
+    padding: 8px;
+    border: 2px outset #ffffff;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.nav-bar a {
+    color: #000000;
+    text-decoration: none;
+    padding: 0 5px;
+}
+
+.nav-bar a:hover {
+    text-decoration: underline;
+    color: #000080;
+}
+
+.main-container {
+    display: table;
+    width: 100%;
+    border-spacing: 10px 0;
+}
+
+.panel {
+    display: table-cell;
+    background-color: #ffffff;
+    border: 2px inset #ffffff;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #ece9d8;
+}
+
+.board-area {
+    width: 500px;
+    text-align: center;
+    background-color: #d4d0c8;
+}
+
+.panel-title {
+    background-color: #808080;
+    color: #ffffff;
+    padding: 4px;
+    margin-top: 0;
+    font-size: 14px;
+}
+
+.retro-hr {
+    border: 0;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #ffffff;
+    margin: 15px 0;
+}
+
+select, input[type="text"], button {
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    border: 2px outset #ffffff;
+    background: #d4d0c8;
+    padding: 4px;
+    margin: 2px 0;
+}
+
+input[type="text"] {
+    background: #ffffff;
+    border: 2px inset #ffffff;
+    width: 130px;
+}
+
+button:active {
+    border: 2px inset #ffffff;
+}
+
+.status-box {
+    border: 2px inset #ffffff;
+    background: #ffffff;
+    padding: 5px;
+    margin-bottom: 5px;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.history-box {
+    border: 2px inset #ffffff;
+    background: #ffffff;
+    height: 350px;
+    overflow-y: auto;
+    font-family: Courier, monospace;
+    font-size: 12px;
+    padding: 5px;
+    line-height: 1.4;
+}
+
+/* 0-Bug Rigid Board Layout */
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
+    border: 4px outset #808080;
+    margin: 0 auto;
+    width: 480px;
+    height: 480px;
+}
+
+.square {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.light { background-color: #eeddbb; }
+.dark { background-color: #996633; }
+.selected { outline: 3px solid #ff0000; outline-offset: -3px; }
+
+.piece {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-drag: none; /* Prevents ghost dragging bugs */
+}
+
+.footer {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 11px;
+    color: #333;
+}
+
+.content-page {
+    background: #ffffff;
+    border: 2px inset #ffffff;
+    padding: 20px;
+    line-height: 1.6;
+}
