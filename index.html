@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GM Chess - Play</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 0-Bug standard chess rule library via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>GM Chess </h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </div>
+    
+    <div class="nav-bar">
+        <a href="index.html">Play Game</a> |
+        <a href="about.html">About Us</a> |
+        <a href="contact.html">Contact Us</a> |
+        <a href="terms.html">Terms of Service</a> |
+        <a href="privacy.html">Privacy Policy</a> |
+        <a href="copyright.html">Copyright</a> |
+        <a href="github.html">GitHub Repository</a>
+    </div>
+
+    <div class="main-container">
+        <div class="panel sidebar">
+            <h3 class="panel-title">Game Controls</h3>
+            <label>Mode:</label>
+            <select id="game-mode" onchange="updateGameState()">
+                <option value="ai-hard">Vs AI (Hard / GM)</option>
+                <option value="ai-easy">Vs AI (Easy / Blitz)</option>
+                <option value="local">Local Multiplayer (Pass & Play)</option>
+            </select>
+            <br><br>
+            <button onclick="resetGame()">Start New Game</button>
+            <button onclick="flipBoard()">Flip Board</button>
+            
+            <hr class="retro-hr">
+            
+            <h3 class="panel-title">Algebraic Typing (Blitz)</h3>
+            <p style="font-size: 11px;">Type FIDE moves (e.g., e4, Nf3, O-O, e8=N) and press Enter.</p>
+            <input type="text" id="type-move" placeholder="Type move here..." autocomplete="off">
+            <button onclick="submitTypedMove()">Submit</button>
+
+            <hr class="retro-hr">
+
+            <h3 class="panel-title">Engine Analysis</h3>
+            <div class="status-box" id="evaluation">Eval: 0.00</div>
+            <div class="status-box" id="status" style="font-weight: bold; color: #000080;">White to move</div>
+        </div>
+
+        <div class="panel board-area">
+            <div id="board"></div>
+        </div>
+
+        <div class="panel sidebar">
+            <h3 class="panel-title">Move History (PGN)</h3>
+            <div id="pgn" class="history-box"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
