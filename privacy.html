@@ -2,29 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Privacy Policy - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
-    </div>
+    <!-- Consistent Header -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
-        <a href="github.html">GitHub Repository</a>
-    </div>
+    <!-- Responsive Flexbox Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
+    </nav>
 
-    <div class="content-page">
-        <h2>Privacy Policy</h2>
-        <p>Our stance on privacy is violently simple.</p>
-        <p>This software operates 100% on the client-side within your browser window. We collect <b>zero</b> telemetry, we utilize <b>zero</b> tracking cookies, and we do not monitor your gameplay.</p>
-        <p>Because there is no backend server logging your game history, once you refresh the page, your game state is deleted from the universe forever.</p>
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">Privacy Policy</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>Our stance on privacy is violently simple.</p>
+                
+                <!-- Windows-style inset box for the core statement -->
+                <div style="background-color: #ece9d8; border: 2px inset #ffffff; padding: 15px; margin: 20px 0;">
+                    <p style="margin: 0;">
+                        This software operates <b>100% on the client-side</b> within your browser window. We collect <b>zero</b> telemetry, we utilize <b>zero</b> tracking cookies, and we do not monitor your gameplay.
+                    </p>
+                </div>
+
+                <p>Because there is no backend server logging your game history, once you refresh the page or close your browser, your game state is deleted from the universe forever.</p>
+                
+                <hr class="retro-hr">
+                
+                <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #333;">
+                    <i>Document Effective Date: August 2026</i>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
