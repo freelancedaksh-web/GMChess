@@ -2,32 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Terms of Service - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess 2000</h1>
-    </div>
+    <!-- Consistent Header -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
-        <a href="github.html">GitHub Repository</a>
-    </div>
+    <!-- Responsive Flexbox Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
+    </nav>
 
-    <div class="content-page">
-        <h2>Terms of Service</h2>
-        <p>By using GM Chess , you agree to the following terms:</p>
-        <ol>
-            <li><b>Usage:</b> This software is provided free of charge for recreational and analytical purposes.</li>
-            <li><b>Liability:</b> While the codebase enforces strict FIDE logic, we are not liable for emotional damage resulting from blundering a queen to our AI.</li>
-            <li><b>Open Source:</b> You are free to fork this project via our GitHub, under the bounds of standard open-source web licenses.</li>
-        </ol>
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">Terms of Service (EULA)</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>By using <strong>GM Chess</strong>, you acknowledge and agree to the following terms:</p>
+                
+                <!-- Windows-style inset box for EULA simulation -->
+                <div style="background-color: #ffffff; border: 2px inset #ffffff; padding: 15px 25px; margin: 20px 0; max-height: 300px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 13px;">
+                    <ol style="margin-top: 0; padding-left: 15px;">
+                        <li style="margin-bottom: 15px;">
+                            <b>Usage:</b> This software is provided free of charge for recreational, educational, and analytical purposes.
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <b>Liability:</b> While the codebase enforces strict FIDE logic, we are absolutely not liable for emotional damage, loss of sleep, or smashed keyboards resulting from blundering a queen to our embedded AI.
+                        </li>
+                        <li style="margin-bottom: 0;">
+                            <b>Open Source:</b> You are free to fork this project via our GitHub repository, operating strictly under the bounds of standard open-source web licenses.
+                        </li>
+                    </ol>
+                </div>
+
+                <hr class="retro-hr">
+                
+                <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #333;">
+                    <i>Document Effective Date: August 2026</i>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
