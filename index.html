@@ -2,68 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GM Chess - Play</title>
-    <link rel="icon" type="image/png" href="file_000000008afc82088f4ba1f43c9fc523.png">
-    
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GM Chess - The Ultimate Retro Engine</title>
     <!-- 0-Bug standard chess rule library via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
+    <header class="header">
+        <h1>GM Chess</h1>
         <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
-    </div>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
-    </div>
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+    </nav>
 
-    <div class="main-container">
-        <div class="panel sidebar">
+    <main class="main-container">
+        <!-- Left Sidebar: Controls -->
+        <aside class="panel sidebar">
             <h3 class="panel-title">Game Controls</h3>
-            <label>Mode:</label>
-            <select id="game-mode" onchange="updateGameState()">
-                <option value="ai-hard">Vs AI (Hard / GM)</option>
-                <option value="ai-easy">Vs AI (Easy / Blitz)</option>
-                <option value="local">Local Multiplayer (Pass & Play)</option>
-            </select>
-            <br><br>
-            <button onclick="resetGame()">Start New Game</button>
-            <button onclick="flipBoard()">Flip Board</button>
+            <div class="control-group">
+                <label for="game-mode">Mode:</label>
+                <select id="game-mode" onchange="resetGame()">
+                    <option value="ai-hard">Vs AI (Grandmaster)</option>
+                    <option value="ai-medium" selected>Vs AI (Club Player)</option>
+                    <option value="ai-easy">Vs AI (Beginner)</option>
+                    <option value="local">Local Multiplayer (Pass & Play)</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="resetGame()">New Game</button>
+                <button onclick="flipBoard()">Flip Board</button>
+            </div>
             
             <hr class="retro-hr">
             
             <h3 class="panel-title">Algebraic Typing (Blitz)</h3>
-            <p style="font-size: 11px;">Type FIDE moves (e.g., e4, Nf3, O-O, e8=N) and press Enter.</p>
-            <input type="text" id="type-move" placeholder="Type move here..." autocomplete="off">
-            <button onclick="submitTypedMove()">Submit</button>
+            <p class="small-text">Type FIDE moves (e.g., e4, Nf3, O-O) and press Enter.</p>
+            <div class="typing-container">
+                <input type="text" id="type-move" placeholder="Type move..." autocomplete="off">
+                <button onclick="submitTypedMove()">Go</button>
+            </div>
 
             <hr class="retro-hr">
 
             <h3 class="panel-title">Engine Analysis</h3>
-            <div class="status-box" id="evaluation">Eval: 0.00</div>
-            <div class="status-box" id="status" style="font-weight: bold; color: #000080;">White to move</div>
-        </div>
+            <div class="status-box" id="evaluation">Eval: +0.00</div>
+            <div class="status-box status-turn" id="status">White to move</div>
+        </aside>
 
-        <div class="panel board-area">
-            <div id="board"></div>
-        </div>
+        <!-- Center: Board -->
+        <section class="panel board-area">
+            <div class="board-wrapper">
+                <div id="board"></div>
+            </div>
+        </section>
 
-        <div class="panel sidebar">
+        <!-- Right Sidebar: History -->
+        <aside class="panel sidebar">
             <h3 class="panel-title">Move History (PGN)</h3>
             <div id="pgn" class="history-box"></div>
-        </div>
-    </div>
+            <button class="full-width-btn" onclick="downloadPGN()">Download PGN</button>
+        </aside>
+    </main>
 
-    <div class="footer">
+    <footer class="footer">
         &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
-    </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
