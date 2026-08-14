@@ -2,32 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>About Us - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
-    </div>
+    <!-- Consistent Header with Main Page -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
-        <a href="github.html">GitHub Repository</a>
-    </div>
+    <!-- Responsive Flexbox Navigation (Matches index.html) -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
+    </nav>
 
-    <div class="content-page">
-        <h2>About GM Chess 2000</h2>
-        <p>Welcome to GM Chess. We believe chess software should be lightning fast, uncompromisingly accurate, and deeply addictive. We built this engine directly in your web browser specifically for two types of people:</p>
-        <ul>
-            <li><b>Typers and Blitz Maniacs:</b> You can submit FIDE algebraic notation continuously without lifting your hands off the keyboard.</li>
-            <li><b>Purists and GMs:</b> We utilize strict `chess.js` constraints. You will never encounter a drag-and-drop ghost bug, an ignored En Passant, or a missed 50-move draw.</li>
-        </ul>
-        <p>The UI is designed to mimic the early 2000s computing era. No distractions, no bloatware—just raw, unapologetic, bug-free chess logic powered by an embedded Stockfish AI.</p>
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">About GM Chess 2000</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>Welcome to <strong>GM Chess</strong>. We believe chess software should be lightning fast, uncompromisingly accurate, and deeply addictive. We built this engine directly in your web browser specifically for two types of people:</p>
+                
+                <ul style="margin-top: 15px; margin-bottom: 15px;">
+                    <li style="margin-bottom: 8px;">
+                        <b>Typers and Blitz Maniacs:</b> Submit FIDE algebraic notation continuously without lifting your hands off the keyboard.
+                    </li>
+                    <li>
+                        <b>Purists and GMs:</b> Utilizing strict <code>chess.js</code> constraints, you will never encounter a drag-and-drop ghost bug, an ignored En Passant, or a missed 50-move draw.
+                    </li>
+                </ul>
+                
+                <hr class="retro-hr">
+                
+                <p>The UI is meticulously designed to mimic the early 2000s computing era. No distractions, no bloatware—just raw, unapologetic, bug-free chess logic powered by an embedded Stockfish AI.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
