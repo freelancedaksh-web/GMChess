@@ -2,32 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Contact Us - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
-    </div>
+    <!-- Consistent Header -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
-        <a href="github.html">GitHub Repository</a>
-    </div>
+    <!-- Responsive Flexbox Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
+    </nav>
 
-    <div class="content-page">
-        <h2>Contact Us</h2>
-        <p>To keep our software light and secure, we do not utilize embedded forms.</p>
-        <p>If you have business inquiries, acquisition inquires ,wish to report an evaluation discrepancy, or just want to challenge our developers, you can email us directly.</p>
-        <p><b>Email Address:</b> info@gmchess.online</p>
-        <p><b>Careers :</b> jobs@gmchess.online</p> 
-        <p><b>Note: We are hiring engineers , Marketing people, Freshers and Experienced all are allowed , Undergraduate and Graduate eligible, Equity + Ad revenue , please share your resume over jobs@gmchess.online only.</p>
-    
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">Contact Us</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>To keep our software light and secure, we do not utilize embedded forms.</p>
+                <p>If you have business inquiries, acquisition inquiries, wish to report an evaluation discrepancy, or just want to challenge our developers, you can email us directly.</p>
+                
+                <!-- Windows-style inset box for contact details -->
+                <div style="background-color: #ece9d8; border: 2px inset #ffffff; padding: 15px; margin: 20px 0;">
+                    <p style="margin-top: 0;"><b>General & Business Inquiries:</b> <a href="mailto:info@gmchess.online">info@gmchess.online</a></p>
+                    <p style="margin-bottom: 0;"><b>Careers & Hiring:</b> <a href="mailto:jobs@gmchess.online">jobs@gmchess.online</a></p>
+                </div>
+
+                <hr class="retro-hr">
+                
+                <!-- Formatted Hiring Section -->
+                <h4 style="margin-bottom: 5px; color: #000080;">We Are Hiring!</h4>
+                <p style="margin-top: 0;">
+                    We are actively seeking Engineers and Marketing professionals. Freshers and experienced candidates are both welcome, and undergraduates and graduates are equally eligible. Compensation includes <b>Equity + Ad revenue sharing</b>.
+                </p>
+                <p>
+                    Please share your resume exclusively at <a href="mailto:jobs@gmchess.online">jobs@gmchess.online</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
