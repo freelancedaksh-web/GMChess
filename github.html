@@ -2,34 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GitHub - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repository - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
-    </div>
+    <!-- Consistent Header -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
+    <!-- Responsive Flexbox Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
         <a href="github.html">GitHub Repository</a>
-    </div>
+    </nav>
 
-    <div class="content-page">
-        <h2>Contribute on GitHub</h2>
-        <p>GM Chess is fully open-source. All files are cleanly split into HTML, CSS, and Vanilla JavaScript.</p>
-        <p><b>Repository URL:</b> <a href="https://github.com/userpuythonacsd/GMChess" target="_blank">GM Chess</a> </p>
-        <p>To contribute:</p>
-        <ol>
-            <li>Fork the repository.</li>
-            <li>Submit a pull request ensuring you introduce <b>NO external build frameworks</b> (No React, No NPM, No Webpack).</li>
-            <li>Ensure all move generation remains strictly routed through the `chess.js` matrix to preserve our 0-bug philosophy.</li>
-        </ol>
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">Contribute on GitHub</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>GM Chess is fully open-source. All files are cleanly split into HTML, CSS, and Vanilla JavaScript with zero external bloatware frameworks.</p>
+                
+                <!-- Windows-style inset box for repository callout -->
+                <div style="background-color: #ece9d8; border: 2px inset #ffffff; padding: 15px; margin: 20px 0;">
+                    <p style="margin-top: 0;"><b>Repository URL:</b> <a href="https://github.com/userpuythonacsd/GMChess" target="_blank" rel="noopener noreferrer">github.com/userpuythonacsd/GMChess</a></p>
+                    <p style="margin-bottom: 0;">Feel free to star, fork, or audit our source code directly on GitHub.</p>
+                </div>
+
+                <h4 style="margin-bottom: 8px; color: #000080;">Contribution Guidelines:</h4>
+                
+                <ol style="margin-top: 5px; padding-left: 20px;">
+                    <li style="margin-bottom: 10px;">Fork the repository to your own GitHub account.</li>
+                    <li style="margin-bottom: 10px;">Submit a pull request ensuring you introduce <b>NO external build frameworks</b> (No React, No NPM, No Webpack). Keep it pure vanilla.</li>
+                    <li style="margin-bottom: 0;">Ensure all move generation remains strictly routed through the <code>chess.js</code> matrix to preserve our 0-bug philosophy.</li>
+                </ol>
+
+                <hr class="retro-hr">
+                
+                <p style="text-align: center; font-size: 12px; margin-top: 20px; color: #333;">
+                    <i>Thank you for supporting open-source chess development!</i>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
