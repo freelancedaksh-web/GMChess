@@ -6,56 +6,53 @@
     <title>Terms of Service - GM Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Consistent Header -->
+<body class="theme-retro">
     <header class="header">
         <h1>GM Chess</h1>
         <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
     </header>
     
-    <!-- Responsive Flexbox Navigation -->
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
-        <a href="copyright.html">Copyright</a>
     </nav>
 
-    <!-- Main Content Wrapped for Responsive Centering -->
     <main class="main-container" style="justify-content: center;">
         <section class="panel content-page" style="flex: 1; max-width: 800px;">
-            <h3 class="panel-title">Terms of Service (EULA)</h3>
+            <h3 class="panel-title">Terms of Service & End User License Agreement</h3>
             
             <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
-                <p>By using <strong>GM Chess</strong>, you acknowledge and agree to the following terms:</p>
+                <p>By accessing or utilizing <strong>GM Chess</strong>, you agree to comply with and be bound by the following operational terms:</p>
                 
-                <!-- Windows-style inset box for EULA simulation -->
-                <div style="background-color: #ffffff; border: 2px inset #ffffff; padding: 15px 25px; margin: 20px 0; max-height: 300px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 13px;">
+                <div style="background-color: var(--bg-color); border: 2px inset var(--border-color); padding: 15px 25px; margin: 20px 0; max-height: 320px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 13px;">
                     <ol style="margin-top: 0; padding-left: 15px;">
                         <li style="margin-bottom: 15px;">
-                            <b>Usage:</b> This software is provided free of charge for recreational, educational, and analytical purposes.
+                            <b>Permitted Use:</b> This software application is provided free of charge for personal recreation, educational analysis, and tactical training purposes.
                         </li>
                         <li style="margin-bottom: 15px;">
-                            <b>Liability:</b> While the codebase enforces strict FIDE logic, we are absolutely not liable for emotional damage, loss of sleep, or smashed keyboards resulting from blundering a queen to our embedded AI.
+                            <b>Limitation of Liability:</b> While rigorous mathematical logic guarantees accurate move evaluation, the developers assume zero liability for psychological frustration, lost sleep, rating drops, or hardware damage resulting from blundering a queen to the Grandmaster AI.
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <b>Intellectual Property & Open Source:</b> Core open-source components (such as Stockfish WASM and chess.js) operate under their respective permissive licenses. Custom interface layouts and branding remain proprietary assets of GM Chess.
                         </li>
                         <li style="margin-bottom: 0;">
-                            <b>Open Source:</b> You are free to fork this project via our GitHub repository, operating strictly under the bounds of standard open-source web licenses.
+                            <b>Service Availability:</b> Because the engine executes entirely on client hardware, we do not guarantee uptime for external CDN script dependencies outside our operational control.
                         </li>
                     </ol>
                 </div>
 
                 <hr class="retro-hr">
                 
-                <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #333;">
+                <p style="text-align: center; font-size: 12px; margin-top: 15px; opacity: 0.8;">
                     <i>Document Effective Date: August 2026</i>
                 </p>
             </div>
         </section>
     </main>
 
-    <!-- Consistent Footer -->
     <footer class="footer">
         &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
     </footer>
