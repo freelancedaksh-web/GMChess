@@ -6,50 +6,51 @@
     <title>Privacy Policy - GM Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- Consistent Header -->
+<body class="theme-retro">
     <header class="header">
         <h1>GM Chess</h1>
         <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
     </header>
     
-    <!-- Responsive Flexbox Navigation -->
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
-        <a href="copyright.html">Copyright</a>
     </nav>
 
-    <!-- Main Content Wrapped for Responsive Centering -->
     <main class="main-container" style="justify-content: center;">
         <section class="panel content-page" style="flex: 1; max-width: 800px;">
-            <h3 class="panel-title">Privacy Policy</h3>
+            <h3 class="panel-title">Privacy Policy & Data Compliance</h3>
             
             <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
-                <p>Our stance on privacy is violently simple.</p>
+                <p>Our commitment to user privacy is absolute and straightforward.</p>
                 
-                <!-- Windows-style inset box for the core statement -->
-                <div style="background-color: #ece9d8; border: 2px inset #ffffff; padding: 15px; margin: 20px 0;">
+                <div style="background-color: var(--bg-color); border: 2px inset var(--border-color); padding: 15px; margin: 20px 0;">
                     <p style="margin: 0;">
-                        This software operates <b>100% on the client-side</b> within your browser window. We collect <b>zero</b> telemetry, we utilize <b>zero</b> tracking cookies, and we do not monitor your gameplay.
+                        GM Chess operates <b>100% on the client-side</b> within your browser sandbox. We collect <b>zero personal telemetry</b>, deploy <b>zero behavioral tracking cookies</b>, and store no historical records of your match moves.
                     </p>
                 </div>
 
-                <p>Because there is no backend server logging your game history, once you refresh the page or close your browser, your game state is deleted from the universe forever.</p>
+                <p>Because there is no active server database recording user activity, closing your browser tab or refreshing the window instantly wipes the volatile game state from memory.</p>
+                
+                <h4 style="margin-top: 20px; color: var(--header-bg);">Third-Party Services</h4>
+                <p>The application interacts with minimal third-party infrastructure solely for operational integrity:</p>
+                <ul style="margin-top: 10px;">
+                    <li><b>CDNs:</b> Stockfish WASM and chess.js scripts are loaded via secure content delivery networks (cdnjs).</li>
+                    <li><b>Analytics Counter:</b> Real-time aggregate visitor counts are tracked anonymously via CounterAPI without exposing personal identifiers.</li>
+                </ul>
                 
                 <hr class="retro-hr">
                 
-                <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #333;">
+                <p style="text-align: center; font-size: 12px; margin-top: 15px; opacity: 0.8;">
                     <i>Document Effective Date: August 2026</i>
                 </p>
             </div>
         </section>
     </main>
 
-    <!-- Consistent Footer -->
     <footer class="footer">
         &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
     </footer>
