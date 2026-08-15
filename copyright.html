@@ -2,34 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Copyright - GM Chess </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copyright & Licenses - GM Chess</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>GM Chess </h1>
-    </div>
+    <!-- Consistent Header -->
+    <header class="header">
+        <h1>GM Chess</h1>
+        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+    </header>
     
-    <div class="nav-bar">
-        <a href="index.html">Play Game</a> |
-        <a href="about.html">About Us</a> |
-        <a href="contact.html">Contact Us</a> |
-        <a href="terms.html">Terms of Service</a> |
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="copyright.html">Copyright</a> |
+    <!-- Responsive Flexbox Navigation -->
+    <nav class="nav-bar">
+        <a href="index.html">Play Game</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
         <a href="github.html">GitHub Repository</a>
-    </div>
+    </nav>
 
-    <div class="content-page">
-        <h2>Copyright & Licenses</h2>
-        <p>&copy; 2026 GM Chess Software. All rights reserved regarding the bespoke UI code.</p>
-        <hr>
-        <h3>Third-Party Attributions:</h3>
-        <ul>
-            <li><b>Stockfish:</b> Licensed under GNU GPLv3. The official Stockfish javascript port is used exclusively via CDN.</li>
-            <li><b>chess.js:</b> By jhlywa. Licensed under standard open source BSD guidelines.</li>
-            <li><b>Chess Pieces (SVG):</b> Public Domain (Wikimedia Commons standard vector set).</li>
-        </ul>
-    </div>
+    <!-- Main Content Wrapped for Responsive Centering -->
+    <main class="main-container" style="justify-content: center;">
+        <section class="panel content-page" style="flex: 1; max-width: 800px;">
+            <h3 class="panel-title">Copyright & Licenses</h3>
+            
+            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
+                <p>&copy; 2026 <strong>GM Chess Software</strong>. All rights reserved regarding the bespoke user interface code, layout design, and retro-styling architecture.</p>
+                
+                <hr class="retro-hr">
+                
+                <h4 style="margin-bottom: 8px; color: #000080;">Third-Party Attributions & Open Source Software:</h4>
+                
+                <!-- Windows-style inset box for structured attributions -->
+                <div style="background-color: #ece9d8; border: 2px inset #ffffff; padding: 15px; margin: 15px 0;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 12px;">
+                            <b>Stockfish Engine:</b> Licensed under the <i>GNU GPLv3</i>. The official Stockfish JavaScript port is utilized entirely client-side via CDN integration.
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <b>chess.js:</b> Developed by jhlywa. Licensed under standard open-source <i>BSD guidelines</i> for precise FIDE move validation.
+                        </li>
+                        <li style="margin-bottom: 0;">
+                            <b>Chess Piece Vectors (SVG):</b> Sourced from <i>Wikimedia Commons</i> standard vector set, released into the <i>Public Domain</i>.
+                        </li>
+                    </ul>
+                </div>
+
+                <p style="text-align: center; font-size: 12px; margin-top: 20px; color: #333;">
+                    <i>For licensing queries, check our repository or reach out via our contact page.</i>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Consistent Footer -->
+    <footer class="footer">
+        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+    </footer>
 </body>
 </html>
