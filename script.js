@@ -230,21 +230,54 @@ function renderBoard() {
 function handleSquareClick(sq) {
     if (chess.game_over()) return;
     const mode = document.getElementById('game-mode').value;
-    
+
+    // ── Online multiplayer path ──────────────────────────────────────────────
+    if (mode.startsWith('online-')) {
+        if (!mpColor || chess.turn() !== mpColor) return;
+
+        if (selectedSquare) {
+            let moveDetails = { from: selectedSquare, to: sq };
+            const piece = chess.get(selectedSquare);
+            if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
+                moveDetails.promotion = 'q';
+            }
+
+            if (chess.moves({ verbose: true }).some(m => m.from === selectedSquare && m.to === sq)) {
+                socket.emit('move', moveDetails);
+                selectedSquare = null;
+                validMovesForSelected = [];
+            } else {
+                const clickedPiece = chess.get(sq);
+                if (clickedPiece && clickedPiece.color === mpColor) {
+                    selectSquare(sq);
+                } else {
+                    selectedSquare = null;
+                    validMovesForSelected = [];
+                    renderBoard();
+                }
+            }
+        } else {
+            const piece = chess.get(sq);
+            if (piece && piece.color === mpColor) selectSquare(sq);
+        }
+        return;
+    }
+
+    // ── AI / Local multiplayer path ──────────────────────────────────────────
     // Only lock clicks when in AI mode AND it's the AI's turn
     if (mode.startsWith('ai-') && chess.turn() === (isFlipped ? 'w' : 'b') && isAiThinking) return;
 
     if (selectedSquare) {
         const isCapture = chess.get(sq) !== null;
         let moveObj = { from: selectedSquare, to: sq };
-        
+
         const piece = chess.get(selectedSquare);
         if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
             moveObj.promotion = 'q';
         }
 
         const result = chess.move(moveObj);
-        
+
         if (result) {
             lastMove = { from: result.from, to: result.to };
             selectedSquare = null;
@@ -281,13 +314,33 @@ typeInput.addEventListener('keyup', function(e) {
 });
 
 function submitTypedMove() {
+    const mode = document.getElementById('game-mode').value;
+
+    // ── Online multiplayer path ──────────────────────────────────────────────
+    if (mode.startsWith('online-')) {
+        if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
+        const moveStr = typeInput.value.trim().replace(/[^a-zA-Z0-9=+\-x#O]/g, '');
+        if (!moveStr) return;
+        const testChess = new Chess(chess.fen());
+        const result = testChess.move(moveStr);
+        if (!result) {
+            alert('Invalid FIDE notation. Example: e4, Nf3, O-O');
+            typeInput.value = '';
+            return;
+        }
+        socket.emit('move', { from: result.from, to: result.to, promotion: result.promotion || 'q' });
+        typeInput.value = '';
+        return;
+    }
+
+    // ── AI / Local multiplayer path ──────────────────────────────────────────
     if (chess.game_over() || isAiThinking) return;
     const moveStr = typeInput.value.trim().replace(/[^a-zA-Z0-9=+-x#O\-]/g, '');
     if (!moveStr) return;
-    
+
     const isCapture = moveStr.includes('x');
-    const result = chess.move(moveStr); 
-    
+    const result = chess.move(moveStr);
+
     if (result) {
         lastMove = { from: result.from, to: result.to };
         typeInput.value = '';
@@ -700,65 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Intercept handleSquareClick for multiplayer enforcement
-const _origHandleSquareClick = handleSquareClick;
-function handleSquareClick(sq) {
-    const mode = document.getElementById('game-mode').value;
-    if (!mode.startsWith('online-')) {
-        return _origHandleSquareClick(sq);
-    }
-    if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
 
-    if (selectedSquare) {
-        let moveDetails = { from: selectedSquare, to: sq };
-        const piece = chess.get(selectedSquare);
-        if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
-            moveDetails.promotion = 'q';
-        }
-
-        if (chess.moves({ verbose: true }).some(m => m.from === selectedSquare && m.to === sq)) {
-            socket.emit('move', moveDetails);
-            selectedSquare = null;
-            validMovesForSelected = [];
-        } else {
-            const clickedPiece = chess.get(sq);
-            if (clickedPiece && clickedPiece.color === mpColor) {
-                selectSquare(sq);
-            } else {
-                selectedSquare = null;
-                validMovesForSelected = [];
-                renderBoard();
-            }
-        }
-    } else {
-        const piece = chess.get(sq);
-        if (piece && piece.color === mpColor) selectSquare(sq);
-    }
-}
-
-// Intercept submitTypedMove for multiplayer enforcement
-const _origSubmitTypedMove = submitTypedMove;
-function submitTypedMove() {
-    const mode = document.getElementById('game-mode').value;
-    if (!mode.startsWith('online-')) {
-        return _origSubmitTypedMove();
-    }
-    if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
-
-    const moveStr = document.getElementById('type-move').value.trim().replace(/[^a-zA-Z0-9=+\-x#O]/g, '');
-    if (!moveStr) return;
-
-    const testChess = new Chess(chess.fen());
-    const result = testChess.move(moveStr);
-    if (!result) {
-        alert('Invalid FIDE notation. Example: e4, Nf3, O-O');
-        document.getElementById('type-move').value = '';
-        return;
-    }
-
-    socket.emit('move', { from: result.from, to: result.to, promotion: result.promotion || 'q' });
-    document.getElementById('type-move').value = '';
-}
 
 // Handle ?room= URL param for direct room join via shared link
 (function checkUrlRoom() {
