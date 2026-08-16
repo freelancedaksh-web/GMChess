@@ -2,57 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Privacy Policy - GM Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-retro">
     <header class="header">
-        <h1>GM Chess</h1>
-        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+        <div class="header-content">
+            <div>
+                <h1>GM Chess</h1>
+                <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+            </div>
+        </div>
     </header>
     
+    <!-- Paste Global Nav Bar Here -->
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
+        <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank">GitHub</a>
     </nav>
 
-    <main class="main-container" style="justify-content: center;">
-        <section class="panel content-page" style="flex: 1; max-width: 800px;">
-            <h3 class="panel-title">Privacy Policy & Data Compliance</h3>
-            
-            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
-                <p>Our commitment to user privacy is absolute and straightforward.</p>
-                
-                <div style="background-color: var(--bg-color); border: 2px inset var(--border-color); padding: 15px; margin: 20px 0;">
-                    <p style="margin: 0;">
-                        GM Chess operates <b>100% on the client-side</b> within your browser sandbox. We collect <b>zero personal telemetry</b>, deploy <b>zero behavioral tracking cookies</b>, and store no historical records of your match moves.
-                    </p>
-                </div>
+    <main class="panel" style="max-width: 800px; margin: 0 auto; line-height: 1.6;">
+        <h2 class="panel-title">Privacy Policy</h2>
+        
+        <h3>Zero Tracking Guarantee</h3>
+        <p>GM Chess respects your privacy to the absolute maximum. Because our application relies entirely on client-side WebAssembly (WASM) and JavaScript, <strong>we do not collect, transmit, or store your gameplay data on our servers.</strong></p>
+        
+        <h3>Local Data Processing</h3>
+        <ul>
+            <li><strong>Engine Evaluation:</strong> All Stockfish engine calculations are performed entirely on your device's CPU.</li>
+            <li><strong>Move History (PGN):</strong> Your game history is generated locally. It is only exported when you explicitly click "Download PGN" or "Analyze on Lichess".</li>
+            <li><strong>Theme Preferences:</strong> We currently do not use tracking cookies. In future updates, we may use local `localStorage` to save your theme preferences, which remains strictly on your hard drive.</li>
+        </ul>
 
-                <p>Because there is no active server database recording user activity, closing your browser tab or refreshing the window instantly wipes the volatile game state from memory.</p>
-                
-                <h4 style="margin-top: 20px; color: var(--header-bg);">Third-Party Services</h4>
-                <p>The application interacts with minimal third-party infrastructure solely for operational integrity:</p>
-                <ul style="margin-top: 10px;">
-                    <li><b>CDNs:</b> Stockfish WASM and chess.js scripts are loaded via secure content delivery networks (cdnjs).</li>
-                    <li><b>Analytics Counter:</b> Real-time aggregate visitor counts are tracked anonymously via CounterAPI without exposing personal identifiers.</li>
-                </ul>
-                
-                <hr class="retro-hr">
-                
-                <p style="text-align: center; font-size: 12px; margin-top: 15px; opacity: 0.8;">
-                    <i>Document Effective Date: August 2026</i>
-                </p>
-            </div>
-        </section>
+        <h3>Third-Party Integrations</h3>
+        <p>If you choose to export your game to Lichess via our "Analyze on Lichess" feature, your PGN data will be sent to the Lichess API. At that point, you are subject to the Lichess Privacy Policy.</p>
+
+        <hr class="retro-hr">
+        <p>If you have any concerns regarding your data, please contact our administrative team at: <a href="mailto:info@gmchess.online" style="color: #0000ee;">info@gmchess.online</a></p>
     </main>
 
     <footer class="footer">
-        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+        &copy; 2026 GM Chess. All Rights Reserved.
     </footer>
 </body>
 </html>
