@@ -488,25 +488,30 @@ modeSelect.addEventListener('change', function() {
 function attachSocketListeners() {
     socket.on('connect_error', (err) => {
         const sUrl = getSocketServerUrl() || location.origin;
-        document.getElementById('mp-title').textContent = 'Server Connection Error';
-        document.getElementById('mp-status').textContent = 'Could not connect to multiplayer server at ' + sUrl + '. Please make sure server.js is running (run "node server.js").';
+        document.getElementById('mp-title').textContent = 'Server Connection Error ⚠️';
+        document.getElementById('mp-status').textContent = 'Unable to connect to multiplayer server at ' + sUrl + '. Please make sure server.js is running (run "node server.js" in terminal).';
         document.getElementById('mp-room-info').style.display = 'none';
-        document.getElementById('mp-overlay').style.display = '';
+        document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-retry-btn').style.display = 'inline-block';
+        document.getElementById('mp-overlay').style.display = 'flex';
     });
 
     socket.on('waitingForOpponent', ({ roomId }) => {
         if (roomId) {
             mpRoomId = roomId;
             document.getElementById('mp-room-id').textContent = roomId;
-            document.getElementById('mp-room-info').style.display = '';
-            document.getElementById('mp-title').textContent = 'Room Created';
-            document.getElementById('mp-status').textContent = 'Share the Room ID or Link. Waiting for opponent to join\u2026';
+            document.getElementById('mp-room-info').style.display = 'block';
+            document.getElementById('mp-title').textContent = 'Room Created! ♟️';
+            document.getElementById('mp-status').textContent = 'Share the Room Code or Link with your opponent. Waiting for them to join\u2026';
+            document.getElementById('mp-join-container').style.display = 'none';
         } else {
-            document.getElementById('mp-title').textContent = 'Random Match';
-            document.getElementById('mp-status').textContent = 'Finding an online player\u2026';
+            document.getElementById('mp-title').textContent = 'Random Matchmaking 🎲';
+            document.getElementById('mp-status').textContent = 'Searching for an online player\u2026 Please wait.';
             document.getElementById('mp-room-info').style.display = 'none';
+            document.getElementById('mp-join-container').style.display = 'none';
         }
-        document.getElementById('mp-overlay').style.display = '';
+        document.getElementById('mp-retry-btn').style.display = 'none';
+        document.getElementById('mp-overlay').style.display = 'flex';
     });
 
     socket.on('gameStart', ({ color, fen, roomId }) => {
@@ -531,8 +536,9 @@ function attachSocketListeners() {
     socket.on('opponentLeft', () => {
         document.getElementById('mp-status').textContent = 'Opponent disconnected.';
         document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-join-container').style.display = 'none';
         document.getElementById('mp-title').textContent = 'Game Over';
-        document.getElementById('mp-overlay').style.display = '';
+        document.getElementById('mp-overlay').style.display = 'flex';
         mpColor = null;
     });
 
@@ -564,25 +570,50 @@ function initMultiplayer(mode) {
 
     mpColor = null;
     chess.reset();
-    document.getElementById('mp-room-info').style.display = 'none';
 
     if (mode === 'online-create') {
+        document.getElementById('mp-title').textContent = 'Creating Room...';
+        document.getElementById('mp-status').textContent = 'Connecting to multiplayer server...';
+        document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-retry-btn').style.display = 'none';
+        document.getElementById('mp-overlay').style.display = 'flex';
         socket.emit('createRoom');
     } else if (mode === 'online-join') {
-        const inputCode = prompt("Enter 6-character Room ID:");
-        if (!inputCode || !inputCode.trim()) {
-            cancelMultiplayer();
-            return;
-        }
-        document.getElementById('mp-title').textContent = 'Join Room';
-        document.getElementById('mp-status').textContent = 'Joining room ' + inputCode.trim().toUpperCase() + '\u2026';
-        document.getElementById('mp-overlay').style.display = '';
-        socket.emit('joinRoom', { roomId: inputCode.trim() });
+        document.getElementById('mp-title').textContent = 'Join Online Room';
+        document.getElementById('mp-status').textContent = 'Enter the 6-character Room Code provided by your opponent:';
+        document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-join-container').style.display = 'block';
+        document.getElementById('mp-retry-btn').style.display = 'none';
+        document.getElementById('mp-join-input').value = '';
+        document.getElementById('mp-overlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('mp-join-input').focus(), 100);
     } else if (mode === 'online-random') {
-        document.getElementById('mp-title').textContent = 'Random Match';
-        document.getElementById('mp-status').textContent = 'Finding an online player\u2026';
-        document.getElementById('mp-overlay').style.display = '';
+        document.getElementById('mp-title').textContent = 'Random Matchmaking 🎲';
+        document.getElementById('mp-status').textContent = 'Searching for an online player... Please wait.';
+        document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-retry-btn').style.display = 'none';
+        document.getElementById('mp-overlay').style.display = 'flex';
         socket.emit('randomMatch');
+    }
+}
+
+function submitJoinRoom() {
+    const inputEl = document.getElementById('mp-join-input');
+    const code = (inputEl.value || '').trim().toUpperCase();
+    if (!code) return alert("Please enter a Room Code.");
+    if (code.length < 4) return alert("Invalid Room Code. Example: AB12CD");
+
+    document.getElementById('mp-status').textContent = 'Joining room ' + code + '\u2026';
+    document.getElementById('mp-join-container').style.display = 'none';
+    socket.emit('joinRoom', { roomId: code });
+}
+
+function retryMultiplayerConnection() {
+    const mode = modeSelect.value;
+    if (mode.startsWith('online-')) {
+        initMultiplayer(mode);
     }
 }
 
@@ -595,10 +626,26 @@ function cancelMultiplayer() {
     resetGame();
 }
 
-function copyRoomLink() {
-    const url = `${location.origin}${location.pathname}?room=${mpRoomId}`;
-    navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => alert('Room ID: ' + mpRoomId));
+function copyRoomCode() {
+    if (!mpRoomId) return;
+    navigator.clipboard.writeText(mpRoomId).then(() => alert('Room Code copied: ' + mpRoomId)).catch(() => alert('Room Code: ' + mpRoomId));
 }
+
+function copyRoomLink() {
+    if (!mpRoomId) return;
+    const url = `${location.origin}${location.pathname}?room=${mpRoomId}`;
+    navigator.clipboard.writeText(url).then(() => alert('Share Link copied!')).catch(() => alert('Room Link: ' + url));
+}
+
+// Bind Enter key on join input field
+document.addEventListener('DOMContentLoaded', () => {
+    const joinInput = document.getElementById('mp-join-input');
+    if (joinInput) {
+        joinInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') submitJoinRoom();
+        });
+    }
+});
 
 // Intercept handleSquareClick for multiplayer enforcement
 const _origHandleSquareClick = handleSquareClick;
@@ -665,13 +712,17 @@ function submitTypedMove() {
     const roomId = new URLSearchParams(location.search).get('room');
     if (!roomId) return;
     modeSelect.value = 'online-create';
+    document.getElementById('mp-title').textContent = 'Join Online Room';
+    document.getElementById('mp-status').textContent = 'Joining room ' + roomId.trim().toUpperCase() + '\u2026';
+    document.getElementById('mp-room-info').style.display = 'none';
+    document.getElementById('mp-join-container').style.display = 'none';
+    document.getElementById('mp-overlay').style.display = 'flex';
+
     const targetUrl = getSocketServerUrl();
     socket = targetUrl ? io(targetUrl) : io();
     attachSocketListeners();
-    document.getElementById('mp-title').textContent = 'Join Room';
-    document.getElementById('mp-status').textContent = 'Joining room ' + roomId + '\u2026';
-    document.getElementById('mp-overlay').style.display = '';
-    socket.emit('joinRoom', { roomId });
+    socket.emit('joinRoom', { roomId: roomId.trim() });
 })();
+
 
 

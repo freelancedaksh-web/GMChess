@@ -152,16 +152,40 @@
         </div>
     </div>
 
-    <!-- Multiplayer overlay: hidden by default, shown only during online modes -->
-    <div id="mp-overlay" style="display:none;">
-        <div id="mp-box" class="panel">
-            <h3 class="panel-title" id="mp-title">Online Multiplayer</h3>
-            <p id="mp-status"></p>
-            <div id="mp-room-info" style="display:none;">
-                <p>Room ID: <strong id="mp-room-id"></strong></p>
-                <button onclick="copyRoomLink()">Copy Link</button>
+    <!-- Multiplayer Overlay Modal -->
+    <div id="mp-overlay" class="modal-overlay">
+        <div id="mp-box" class="modal-content" style="max-width:420px; text-align:center;">
+            <div class="modal-header">
+                <h3 class="panel-title" id="mp-title" style="margin:0;">Online Multiplayer</h3>
+                <button class="close-btn" onclick="cancelMultiplayer()">X</button>
             </div>
-            <button id="mp-cancel-btn" onclick="cancelMultiplayer()">Cancel</button>
+            <div style="padding: 15px 20px;">
+                <p id="mp-status" style="font-size:14px; margin-bottom:15px;"></p>
+                
+                <!-- Create Room Details -->
+                <div id="mp-room-info" style="display:none; margin-bottom:15px;">
+                    <p style="margin:5px 0;">Room Code:</p>
+                    <div style="font-size: 24px; font-weight: bold; letter-spacing: 4px; font-family: monospace; background: #ffffff; border: 2px inset var(--border-darker); padding: 8px; margin: 10px 0; color: #000;" id="mp-room-id">------</div>
+                    <div class="button-group" style="justify-content:center;">
+                        <button onclick="copyRoomCode()">Copy Code</button>
+                        <button onclick="copyRoomLink()">Copy Share Link</button>
+                    </div>
+                </div>
+
+                <!-- Join Room Form -->
+                <div id="mp-join-container" style="display:none; margin-bottom:15px;">
+                    <div class="typing-container">
+                        <input type="text" id="mp-join-input" placeholder="Enter 6-character Code (e.g. AB12CD)" autocomplete="off" style="text-transform:uppercase; text-align:center; font-weight:bold; letter-spacing:2px;">
+                        <button onclick="submitJoinRoom()" class="action-btn">Join Game</button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
+                    <button id="mp-retry-btn" onclick="retryMultiplayerConnection()" style="display:none;" class="action-btn">Retry Connection</button>
+                    <button id="mp-cancel-btn" onclick="cancelMultiplayer()">Cancel / Exit</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
