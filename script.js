@@ -24,6 +24,8 @@ const pieceImages = {
     'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg'
 };
 
+// let aiSafetyTimer = null;
+
 // Initialize Stockfish Worker robustly
 function initEngine() {
     try {
@@ -40,9 +42,35 @@ function initEngine() {
         engine.postMessage('uci');
         engine.postMessage('isready');
     } catch (e) {
-        console.error("Failed to load engine blob. Ensure your browser supports Web Workers.", e);
-        document.getElementById('status').textContent = "Engine Load Error";
+        console.error("Failed to load engine worker.", e);
+        engine = null;
     }
+}
+
+function makeFallbackAiMove() {
+    if (chess.game_over()) {
+        isAiThinking = false;
+        return;
+    }
+    const moves = chess.moves({ verbose: true });
+    if (moves.length === 0) {
+        isAiThinking = false;
+        return;
+    }
+    const captures = moves.filter(m => m.captured);
+    const checks = moves.filter(m => m.san && m.san.includes('+'));
+    const chosen = (captures.length > 0) ? captures[Math.floor(Math.random() * captures.length)]
+                 : (checks.length > 0) ? checks[Math.floor(Math.random() * checks.length)]
+                 : moves[Math.floor(Math.random() * moves.length)];
+    
+    const result = chess.move(chosen);
+    if (result) {
+        lastMove = { from: result.from, to: result.to };
+        playSound(result.captured ? 'capture' : 'move');
+        if (chess.in_check()) playSound('check');
+    }
+    isAiThinking = false;
+    updateGameState();
 }
 
 // Handle responses from Stockfish
@@ -68,6 +96,7 @@ function handleEngineMessage(event) {
 
     // Best move execution
     if (line.startsWith('bestmove')) {
+        clearTimeout(aiSafetyTimer);
         const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
         if (match && match[1] && isAiThinking) {
             const moveStr = match[1];
@@ -118,63 +147,72 @@ document.addEventListener('click', initAudio, { once: true });
 function playSound(type) {
     if (document.getElementById('sound-toggle').value === 'off' || !audioCtx) return;
     
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    const now = audioCtx.currentTime;
-    if (type === 'move') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now); osc.stop(now + 0.1);
-    } else if (type === 'capture') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now); osc.stop(now + 0.15);
-    } else if (type === 'check') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now); osc.stop(now + 0.3);
-    }
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        if (type === 'move') {
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === 'capture') {
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } else if (type === 'check') {
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.setValueAtTime(900, now + 0.08);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+    } catch(e) {}
 }
 
-// Rendering & Logic
+// Render Board & UI Updates
 function renderBoard() {
     const boardEl = document.getElementById('board');
-    boardEl.innerHTML = ''; 
-    const board = chess.board(); 
-
+    boardEl.innerHTML = '';
+    
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-            const boardRow = isFlipped ? 7 - r : r;
-            const boardCol = isFlipped ? 7 - c : c;
-            const piece = board[boardRow][boardCol];
-            const sq = String.fromCharCode(97 + boardCol) + (8 - boardRow);
+            const rank = isFlipped ? r + 1 : 8 - r;
+            const fileIdx = isFlipped ? 7 - c : c;
+            const file = String.fromCharCode(97 + fileIdx);
+            const sq = file + rank;
             
             const squareEl = document.createElement('div');
-            squareEl.className = 'square ' + ((boardRow + boardCol) % 2 === 0 ? 'light' : 'dark');
+            squareEl.className = `square ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
             squareEl.dataset.square = sq;
             
-            if (selectedSquare === sq) squareEl.classList.add('selected');
-            if (lastMove && (lastMove.from === sq || lastMove.to === sq)) squareEl.classList.add('last-move');
-            if (validMovesForSelected.includes(sq)) squareEl.classList.add('valid-move-dot');
+            if (lastMove && (lastMove.from === sq || lastMove.to === sq)) {
+                squareEl.classList.add('last-move');
+            }
+            if (selectedSquare === sq) {
+                squareEl.classList.add('selected');
+            }
+            if (validMovesForSelected.includes(sq)) {
+                squareEl.classList.add('valid-move-dot');
+            }
             
+            const piece = chess.get(sq);
             if (piece) {
-                const img = document.createElement('img');
-                const key = piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
-                img.src = pieceImages[key];
-                img.className = 'piece';
-                img.alt = key;
-                squareEl.appendChild(img);
+                const pieceImg = document.createElement('img');
+                const key = piece.color === 'w' ? piece.type.toUpperCase() : piece.type.toLowerCase();
+                pieceImg.src = pieceImages[key];
+                pieceImg.className = 'piece';
+                squareEl.appendChild(pieceImg);
             }
             
             squareEl.addEventListener('click', () => handleSquareClick(sq));
@@ -190,17 +228,17 @@ function renderBoard() {
 function handleSquareClick(sq) {
     if (chess.game_over()) return;
     const mode = document.getElementById('game-mode').value;
-    if (mode !== 'local' && chess.turn() === (isFlipped ? 'w' : 'b') && isAiThinking) return;
+    
+    // Only lock clicks when in AI mode AND it's the AI's turn
+    if (mode.startsWith('ai-') && chess.turn() === (isFlipped ? 'w' : 'b') && isAiThinking) return;
 
     if (selectedSquare) {
         const isCapture = chess.get(sq) !== null;
-        // Attempt move. If promotion is needed but unspecified, chess.js defaults to returning null unless 'promotion' is provided.
         let moveObj = { from: selectedSquare, to: sq };
         
-        // Check if it's a pawn promotion move
         const piece = chess.get(selectedSquare);
         if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
-            moveObj.promotion = 'q'; // Auto-queen for simplicity in blitz
+            moveObj.promotion = 'q';
         }
 
         const result = chess.move(moveObj);
@@ -213,7 +251,6 @@ function handleSquareClick(sq) {
             if (chess.in_check()) playSound('check');
             updateGameState();
         } else {
-            // Clicked an invalid square, select new piece if it's yours
             const clickedPiece = chess.get(sq);
             if (clickedPiece && clickedPiece.color === chess.turn()) selectSquare(sq);
             else {
@@ -335,7 +372,6 @@ function loadFEN() {
 
 // Engine Triggering
 function triggerAI() {
-    if (!engine) return;
     const mode = document.getElementById('game-mode').value;
     if (mode === 'local' || mode.startsWith('online-')) return;
 
@@ -346,9 +382,25 @@ function triggerAI() {
     if (mode === 'ai-gm') { depth = '18'; skill = '20'; }
 
     isAiThinking = true;
-    engine.postMessage('setoption name Skill Level value ' + skill);
-    engine.postMessage('position fen ' + chess.fen());
-    engine.postMessage('go depth ' + depth); 
+    clearTimeout(aiSafetyTimer);
+
+    if (engine) {
+        try {
+            engine.postMessage('setoption name Skill Level value ' + skill);
+            engine.postMessage('position fen ' + chess.fen());
+            engine.postMessage('go depth ' + depth);
+            aiSafetyTimer = setTimeout(() => {
+                if (isAiThinking) {
+                    makeFallbackAiMove();
+                }
+            }, 1200);
+            return;
+        } catch(e) {
+            console.error("Worker postMessage failed", e);
+        }
+    }
+    
+    setTimeout(makeFallbackAiMove, 200);
 }
 
 function updateGameState() {
