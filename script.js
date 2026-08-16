@@ -337,7 +337,7 @@ function loadFEN() {
 function triggerAI() {
     if (!engine) return;
     const mode = document.getElementById('game-mode').value;
-    if (mode === 'local') return;
+    if (mode === 'local' || mode === 'online-create' || mode === 'online-join') return;
 
     let depth = '10', skill = '10';
     if (mode === 'ai-beginner') { depth = '5'; skill = '0'; }
@@ -355,11 +355,14 @@ function updateGameState() {
     renderBoard();
     checkStatus();
     
+    const mode = document.getElementById('game-mode').value;
+    if (mode === 'online-create' || mode === 'online-join') return;
+
     if (engine) engine.postMessage('stop'); 
     
     if (chess.game_over()) return;
 
-    if (document.getElementById('game-mode').value !== 'local' && chess.turn() === (isFlipped ? 'w' : 'b')) {
+    if (mode !== 'local' && chess.turn() === (isFlipped ? 'w' : 'b')) {
         setTimeout(triggerAI, 50);
     } else {
         isAiThinking = false;
@@ -453,3 +456,179 @@ window.onload = function() {
     updateGameState();
     fetchHitCount();
 };
+
+// ─── Multiplayer ───────────────────────────────────────────────────────────────
+
+let socket = null;
+let mpColor = null; // 'w' or 'b' — assigned side
+let mpRoomId = null;
+
+const modeSelect = document.getElementById('game-mode');
+modeSelect.addEventListener('change', function() {
+    const mode = this.value;
+    if (mode === 'online-create' || mode === 'online-join') {
+        initMultiplayer(mode);
+    } else if (socket) {
+        socket.disconnect();
+        socket = null;
+        mpColor = null;
+        mpRoomId = null;
+        document.getElementById('mp-overlay').style.display = 'none';
+    }
+});
+
+function attachSocketListeners() {
+    socket.on('waitingForOpponent', ({ roomId }) => {
+        if (roomId) {
+            mpRoomId = roomId;
+            document.getElementById('mp-room-id').textContent = roomId;
+            document.getElementById('mp-room-info').style.display = '';
+            document.getElementById('mp-title').textContent = 'Create Room';
+        }
+        document.getElementById('mp-status').textContent = 'Waiting for opponent\u2026';
+        document.getElementById('mp-overlay').style.display = '';
+    });
+
+    socket.on('gameStart', ({ color, fen, roomId }) => {
+        mpColor = color;
+        mpRoomId = roomId;
+        chess.load(fen);
+        document.getElementById('mp-overlay').style.display = 'none';
+        isFlipped = (color === 'b');
+        updateGameState();
+    });
+
+    socket.on('moveApplied', ({ fen, from, to, captured, inCheck }) => {
+        chess.load(fen);
+        lastMove = { from, to };
+        selectedSquare = null;
+        validMovesForSelected = [];
+        playSound(captured ? 'capture' : 'move');
+        if (inCheck) playSound('check');
+        updateGameState();
+    });
+
+    socket.on('opponentLeft', () => {
+        document.getElementById('mp-status').textContent = 'Opponent disconnected.';
+        document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-title').textContent = 'Game Over';
+        document.getElementById('mp-overlay').style.display = '';
+        mpColor = null;
+    });
+
+    socket.on('error', (msg) => alert(msg));
+}
+
+function initMultiplayer(mode) {
+    clearTimeout(analysisTimeout);
+    if (engine) engine.postMessage('stop');
+    isAiThinking = false;
+
+    if (socket) {
+        socket.disconnect();
+        socket = null;
+    }
+    socket = io();
+    attachSocketListeners();
+
+    mpColor = null;
+    chess.reset();
+    document.getElementById('mp-room-info').style.display = 'none';
+
+    if (mode === 'online-create') {
+        socket.emit('createRoom');
+    } else {
+        document.getElementById('mp-title').textContent = 'Random Match';
+        document.getElementById('mp-status').textContent = 'Finding opponent\u2026';
+        document.getElementById('mp-overlay').style.display = '';
+        socket.emit('randomMatch');
+    }
+}
+
+function cancelMultiplayer() {
+    document.getElementById('mp-overlay').style.display = 'none';
+    if (socket) { socket.disconnect(); socket = null; }
+    mpColor = null;
+    mpRoomId = null;
+    modeSelect.value = 'ai-club';
+    resetGame();
+}
+
+function copyRoomLink() {
+    const url = `${location.origin}${location.pathname}?room=${mpRoomId}`;
+    navigator.clipboard.writeText(url).then(() => alert('Link copied!')).catch(() => alert('Room ID: ' + mpRoomId));
+}
+
+// Intercept handleSquareClick for multiplayer enforcement
+const _origHandleSquareClick = handleSquareClick;
+function handleSquareClick(sq) {
+    const mode = document.getElementById('game-mode').value;
+    if (mode !== 'online-create' && mode !== 'online-join') {
+        return _origHandleSquareClick(sq);
+    }
+    if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
+
+    if (selectedSquare) {
+        let moveDetails = { from: selectedSquare, to: sq };
+        const piece = chess.get(selectedSquare);
+        if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
+            moveDetails.promotion = 'q';
+        }
+
+        if (chess.moves({ verbose: true }).some(m => m.from === selectedSquare && m.to === sq)) {
+            socket.emit('move', moveDetails);
+            selectedSquare = null;
+            validMovesForSelected = [];
+        } else {
+            const clickedPiece = chess.get(sq);
+            if (clickedPiece && clickedPiece.color === mpColor) {
+                selectSquare(sq);
+            } else {
+                selectedSquare = null;
+                validMovesForSelected = [];
+                renderBoard();
+            }
+        }
+    } else {
+        const piece = chess.get(sq);
+        if (piece && piece.color === mpColor) selectSquare(sq);
+    }
+}
+
+// Intercept submitTypedMove for multiplayer enforcement
+const _origSubmitTypedMove = submitTypedMove;
+function submitTypedMove() {
+    const mode = document.getElementById('game-mode').value;
+    if (mode !== 'online-create' && mode !== 'online-join') {
+        return _origSubmitTypedMove();
+    }
+    if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
+
+    const moveStr = document.getElementById('type-move').value.trim().replace(/[^a-zA-Z0-9=+\-x#O]/g, '');
+    if (!moveStr) return;
+
+    const testChess = new Chess(chess.fen());
+    const result = testChess.move(moveStr);
+    if (!result) {
+        alert('Invalid FIDE notation. Example: e4, Nf3, O-O');
+        document.getElementById('type-move').value = '';
+        return;
+    }
+
+    socket.emit('move', { from: result.from, to: result.to, promotion: result.promotion || 'q' });
+    document.getElementById('type-move').value = '';
+}
+
+// Handle ?room= URL param for direct room join via shared link
+(function checkUrlRoom() {
+    const roomId = new URLSearchParams(location.search).get('room');
+    if (!roomId) return;
+    modeSelect.value = 'online-create';
+    socket = io();
+    attachSocketListeners();
+    document.getElementById('mp-title').textContent = 'Join Room';
+    document.getElementById('mp-status').textContent = 'Joining room ' + roomId + '\u2026';
+    document.getElementById('mp-overlay').style.display = '';
+    socket.emit('joinRoom', { roomId });
+})();
+
