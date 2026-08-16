@@ -97,24 +97,26 @@ function handleEngineMessage(event) {
     // Best move execution
     if (line.startsWith('bestmove')) {
         clearTimeout(aiSafetyTimer);
-        const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
-        if (match && match[1] && isAiThinking) {
-            const moveStr = match[1];
-            const from = moveStr.substring(0, 2);
-            const to = moveStr.substring(2, 4);
-            const promotion = moveStr.length > 4 ? moveStr[4] : 'q';
-            
-            const isCapture = chess.get(to) !== null;
-            const result = chess.move({ from, to, promotion });
-            
-            if(result) {
-                lastMove = { from, to };
-                playSound(isCapture ? 'capture' : 'move');
-                if (chess.in_check()) playSound('check');
+        if (isAiThinking) {
+            const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
+            if (match && match[1]) {
+                const moveStr = match[1];
+                const from = moveStr.substring(0, 2);
+                const to = moveStr.substring(2, 4);
+                const promotion = moveStr.length > 4 ? moveStr[4] : 'q';
+                
+                const isCapture = chess.get(to) !== null;
+                const result = chess.move({ from, to, promotion });
+                
+                if(result) {
+                    lastMove = { from, to };
+                    playSound(isCapture ? 'capture' : 'move');
+                    if (chess.in_check()) playSound('check');
+                }
             }
+            isAiThinking = false;
+            updateGameState();
         }
-        isAiThinking = false;
-        updateGameState();
     }
 }
 
