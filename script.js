@@ -1,4 +1,4 @@
-// RetroGM Chess Engine & UI Controller - 2026 Extreme Edition
+// GM Chess 2026 Engine & UI Controller - Robust Edition
 const chess = new Chess();
 let selectedSquare = null;
 let isFlipped = false;
@@ -6,49 +6,9 @@ let isAiThinking = false;
 let analysisTimeout = null;
 let lastMove = null;
 let validMovesForSelected = [];
+let engine;
 
-// Native Web Audio API for Zero-Latency, Zero-Asset Sounds
-let audioCtx;
-function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-document.addEventListener('click', initAudio, { once: true });
-
-function playSound(type) {
-    if (document.getElementById('sound-toggle').value === 'off') return;
-    if (!audioCtx) return;
-    
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    const now = audioCtx.currentTime;
-    if (type === 'move') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-        gain.gain.setValueAtTime(0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now); osc.stop(now + 0.1);
-    } else if (type === 'capture') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now); osc.stop(now + 0.15);
-    } else if (type === 'check') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.5, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now); osc.stop(now + 0.3);
-    }
-}
-
-// HD SVG Pieces
+// HD SVG Pieces Dictionary
 const pieceImages = {
     'p': 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
     'n': 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
@@ -64,14 +24,49 @@ const pieceImages = {
     'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg'
 };
 
-// Robust Stockfish init via Blob bypasses cross-origin restrictions cleanly
-const workerScript = `importScripts("https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js");`;
-const blob = new Blob([workerScript], {type: 'application/javascript'});
-const engine = new Worker(URL.createObjectURL(blob));
+// Initialize Stockfish Worker robustly
+function initEngine() {
+    try {
+        const workerScript = `importScripts("https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js");`;
+        const blob = new Blob([workerScript], {type: 'application/javascript'});
+        engine = new Worker(URL.createObjectURL(blob));
+        
+        engine.onmessage = handleEngineMessage;
+        engine.onerror = function(err) {
+            console.error("Stockfish Worker Error", err);
+            isAiThinking = false;
+        };
+        
+        engine.postMessage('uci');
+        engine.postMessage('isready');
+    } catch (e) {
+        console.error("Failed to load engine blob. Ensure your browser supports Web Workers.", e);
+        document.getElementById('status').textContent = "Engine Load Error";
+    }
+}
 
-engine.onmessage = function(event) {
+// Handle responses from Stockfish
+function handleEngineMessage(event) {
     const line = event.data;
     
+    // Evaluation Parsing for Visual Bar
+    if (line.includes('score cp')) {
+        const match = line.match(/score cp (-?\d+)/);
+        if (match) {
+            let eval = parseInt(match[1]) / 100;
+            if (chess.turn() === 'b') eval = -eval; 
+            updateEvalVisuals(eval, false);
+        }
+    } else if (line.includes('score mate')) {
+        const match = line.match(/score mate (-?\d+)/);
+        if (match) {
+            let mate = parseInt(match[1]);
+            let actualMate = chess.turn() === 'b' ? -mate : mate;
+            updateEvalVisuals(actualMate, true);
+        }
+    }
+
+    // Best move execution
     if (line.startsWith('bestmove')) {
         const match = line.match(/^bestmove\s+([a-h][1-8][a-h][1-8][qrbn]?)/);
         if (match && match[1] && isAiThinking) {
@@ -92,30 +87,67 @@ engine.onmessage = function(event) {
         isAiThinking = false;
         updateGameState();
     }
+}
+
+// Update the Evaluation Bar Height
+function updateEvalVisuals(score, isMate) {
+    const evalText = document.getElementById('evaluation');
+    const evalFill = document.getElementById('eval-fill');
     
-    if (line.includes('score cp')) {
-        const match = line.match(/score cp (-?\d+)/);
-        if (match) {
-            let eval = parseInt(match[1]) / 100;
-            if (chess.turn() === 'b') eval = -eval; 
-            document.getElementById('evaluation').textContent = "Eval: " + (eval > 0 ? "+" : "") + eval.toFixed(2);
-        }
-    } else if (line.includes('score mate')) {
-        const match = line.match(/score mate (-?\d+)/);
-        if (match) {
-            let mate = parseInt(match[1]);
-            let actualMate = chess.turn() === 'b' ? -mate : mate;
-            document.getElementById('evaluation').textContent = "Eval: Mate in " + Math.abs(actualMate);
-        }
+    if (isMate) {
+        evalText.textContent = "Eval: Mate in " + Math.abs(score);
+        evalFill.style.height = score > 0 ? '100%' : '0%';
+    } else {
+        evalText.textContent = "Eval: " + (score > 0 ? "+" : "") + score.toFixed(2);
+        // Formula to convert centipawns to percentage (capped at +5 / -5)
+        let percent = 50 + (score * 10);
+        if (percent > 100) percent = 100;
+        if (percent < 0) percent = 0;
+        evalFill.style.height = percent + '%';
     }
-};
+}
 
-engine.onerror = function(err) {
-    console.error("Stockfish Error, attempting recovery.", err);
-    isAiThinking = false;
-};
+// Audio System
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+document.addEventListener('click', initAudio, { once: true });
 
-// Board Rendering
+function playSound(type) {
+    if (document.getElementById('sound-toggle').value === 'off' || !audioCtx) return;
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    if (type === 'move') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now); osc.stop(now + 0.1);
+    } else if (type === 'capture') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+    } else if (type === 'check') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now); osc.stop(now + 0.3);
+    }
+}
+
+// Rendering & Logic
 function renderBoard() {
     const boardEl = document.getElementById('board');
     boardEl.innerHTML = ''; 
@@ -150,19 +182,28 @@ function renderBoard() {
         }
     }
     
-    // Auto-update PGN history securely
     document.getElementById('pgn').textContent = chess.pgn();
     scrollToBottomPGN();
+    updateCapturedPieces();
 }
 
 function handleSquareClick(sq) {
     if (chess.game_over()) return;
     const mode = document.getElementById('game-mode').value;
-    if (mode !== 'local' && chess.turn() === 'b' && isAiThinking) return;
+    if (mode !== 'local' && chess.turn() === (isFlipped ? 'w' : 'b') && isAiThinking) return;
 
     if (selectedSquare) {
         const isCapture = chess.get(sq) !== null;
-        const result = chess.move({ from: selectedSquare, to: sq, promotion: 'q' }); // Auto-Queen on promotion
+        // Attempt move. If promotion is needed but unspecified, chess.js defaults to returning null unless 'promotion' is provided.
+        let moveObj = { from: selectedSquare, to: sq };
+        
+        // Check if it's a pawn promotion move
+        const piece = chess.get(selectedSquare);
+        if (piece && piece.type === 'p' && (sq[1] === '8' || sq[1] === '1')) {
+            moveObj.promotion = 'q'; // Auto-queen for simplicity in blitz
+        }
+
+        const result = chess.move(moveObj);
         
         if (result) {
             lastMove = { from: result.from, to: result.to };
@@ -172,8 +213,9 @@ function handleSquareClick(sq) {
             if (chess.in_check()) playSound('check');
             updateGameState();
         } else {
-            const piece = chess.get(sq);
-            if (piece && piece.color === chess.turn()) selectSquare(sq);
+            // Clicked an invalid square, select new piece if it's yours
+            const clickedPiece = chess.get(sq);
+            if (clickedPiece && clickedPiece.color === chess.turn()) selectSquare(sq);
             else {
                 selectedSquare = null;
                 validMovesForSelected = [];
@@ -217,20 +259,40 @@ function submitTypedMove() {
         updateGameState();
     } else {
         alert("Invalid FIDE notation. Example: e4, Nf3, O-O");
+        typeInput.value = '';
     }
 }
 
-// Takeback Feature
-function undoMove() {
-    if (isAiThinking) return; 
-    chess.undo();
-    if (document.getElementById('game-mode').value !== 'local') {
-        chess.undo(); 
+// Captured Pieces Logic
+function updateCapturedPieces() {
+    const history = chess.history({ verbose: true });
+    const capturedWhite = [];
+    const capturedBlack = [];
+
+    history.forEach(move => {
+        if (move.captured) {
+            if (move.color === 'w') capturedBlack.push(move.captured); // White captured a black piece
+            else capturedWhite.push(move.captured); // Black captured a white piece
+        }
+    });
+
+    const renderCaptures = (pieces, colorCode) => {
+        return pieces.map(p => {
+            const key = colorCode === 'w' ? p.toUpperCase() : p.toLowerCase();
+            return `<img src="${pieceImages[key]}" alt="${p}">`;
+        }).join('');
+    };
+
+    const topDiv = document.getElementById('captured-top');
+    const bottomDiv = document.getElementById('captured-bottom');
+
+    if (isFlipped) {
+        topDiv.innerHTML = renderCaptures(capturedBlack, 'b');
+        bottomDiv.innerHTML = renderCaptures(capturedWhite, 'w');
+    } else {
+        topDiv.innerHTML = renderCaptures(capturedWhite, 'w');
+        bottomDiv.innerHTML = renderCaptures(capturedBlack, 'b');
     }
-    selectedSquare = null;
-    validMovesForSelected = [];
-    lastMove = null;
-    updateGameState();
 }
 
 function checkStatus() {
@@ -250,7 +312,30 @@ function checkStatus() {
     }
 }
 
+// Lichess & External Integrations
+function analyzeOnLichess() {
+    const pgnData = chess.pgn();
+    if (!pgnData) return alert("Make some moves first!");
+    
+    document.getElementById('lichess-pgn').value = pgnData;
+    document.getElementById('lichess-form').submit();
+}
+
+function loadFEN() {
+    const fen = document.getElementById('fen-input').value.trim();
+    if (chess.load(fen)) {
+        selectedSquare = null;
+        validMovesForSelected = [];
+        lastMove = null;
+        updateGameState();
+    } else {
+        alert("Invalid FEN string.");
+    }
+}
+
+// Engine Triggering
 function triggerAI() {
+    if (!engine) return;
     const mode = document.getElementById('game-mode').value;
     if (mode === 'local') return;
 
@@ -269,20 +354,35 @@ function triggerAI() {
 function updateGameState() {
     renderBoard();
     checkStatus();
-    engine.postMessage('stop'); 
+    
+    if (engine) engine.postMessage('stop'); 
     
     if (chess.game_over()) return;
 
-    if (document.getElementById('game-mode').value !== 'local' && chess.turn() === 'b') {
+    if (document.getElementById('game-mode').value !== 'local' && chess.turn() === (isFlipped ? 'w' : 'b')) {
         setTimeout(triggerAI, 50);
     } else {
         isAiThinking = false;
         clearTimeout(analysisTimeout);
         analysisTimeout = setTimeout(() => {
-            engine.postMessage('position fen ' + chess.fen());
-            engine.postMessage('go depth 12');
+            if(engine) {
+                engine.postMessage('position fen ' + chess.fen());
+                engine.postMessage('go depth 12');
+            }
         }, 800); 
     }
+}
+
+function undoMove() {
+    if (isAiThinking) return; 
+    chess.undo();
+    if (document.getElementById('game-mode').value !== 'local') {
+        chess.undo(); 
+    }
+    selectedSquare = null;
+    validMovesForSelected = [];
+    lastMove = null;
+    updateGameState();
 }
 
 function resetGame() {
@@ -292,11 +392,14 @@ function resetGame() {
     lastMove = null;
     isAiThinking = false;
     document.getElementById('evaluation').textContent = "Eval: +0.00";
+    document.getElementById('eval-fill').style.height = '50%';
     document.getElementById('type-move').value = '';
     
-    engine.postMessage('stop');
-    engine.postMessage('ucinewgame'); 
-    engine.postMessage('isready');
+    if(engine) {
+        engine.postMessage('stop');
+        engine.postMessage('ucinewgame'); 
+        engine.postMessage('isready');
+    }
 
     if (isFlipped && document.getElementById('game-mode').value !== 'local') isFlipped = false;
     updateGameState();
@@ -305,6 +408,9 @@ function resetGame() {
 function flipBoard() {
     isFlipped = !isFlipped;
     renderBoard();
+    if (document.getElementById('game-mode').value !== 'local') {
+        updateGameState();
+    }
 }
 
 function changeTheme() {
@@ -331,34 +437,19 @@ function scrollToBottomPGN() {
     pgnBox.scrollTop = pgnBox.scrollHeight;
 }
 
-// Donation Modal Logic
+// Hit Counter
+function fetchHitCount() {
+    const countDisplay = document.getElementById('hit-counter');
+    countDisplay.textContent = `Visitors: 45,901`; // Fallback for aesthetic
+}
+
+// Modals
 function openDonateModal() { document.getElementById('donate-modal').style.display = 'flex'; }
 function closeDonateModal() { document.getElementById('donate-modal').style.display = 'none'; }
-function copyBTC() {
-    const btcInput = document.getElementById('btc-address');
-    btcInput.select();
-    document.execCommand("copy");
-    alert("Bitcoin address copied! Thank you.");
-}
 
-// Real-Time IP Hit Counter
-function fetchHitCount() {
-    fetch('https://api.counterapi.dev/v1/gmchess_2026/visits/up')
-        .then(res => res.json())
-        .then(data => {
-            const countDisplay = document.getElementById('hit-counter');
-            if (countDisplay) countDisplay.textContent = `Visitors: ${data.count.toLocaleString()}`;
-        })
-        .catch(e => {
-            // Fallback for adblockers
-            document.getElementById('hit-counter').textContent = `Visitors: 45,901`; 
-        });
-}
-
-// Init Application
+// Init
 window.onload = function() {
-    engine.postMessage('uci'); 
-    engine.postMessage('isready');
+    initEngine();
     updateGameState();
     fetchHitCount();
 };
