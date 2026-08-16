@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog - GM Chess</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Change Log - GM Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-retro">
@@ -11,49 +11,59 @@
         <div class="header-content">
             <div>
                 <h1>GM Chess</h1>
-                <p>The Ultimate 0-Bug Browser Engine - System Updates</p>
+                <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
             </div>
         </div>
     </header>
     
+    <!-- Paste Global Nav Bar Here -->
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
-        <a href="changelog.html">Changelog</a>
-        <a href="donate.html">Donate</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
+        <a href="changelog.html">Change Log</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
+        <a href="copyright.html">Copyright</a>
+        <a href="github.html">GitHub Repository</a>
     </nav>
 
-    <main class="main-container" style="display: block;">
-        <section class="panel">
-            <h2 class="panel-title">Version History & Updates</h2>
-            
-            <div style="padding: 10px;">
-                <h3 style="color: var(--header-bg); border-bottom: 1px solid var(--border-dark);">v2.0.0 (August 2026) - The Grandmaster Update</h3>
-                <ul>
-                    <li><strong>Engine:</strong> Integrated Stockfish 10 WASM via Web Workers to prevent UI thread freezing.</li>
-                    <li><strong>Feature:</strong> Added 4 dynamic difficulty tiers (Beginner, Club, Master, GM) mapping to Stockfish skill levels 0-20 and depths 5-18.</li>
-                    <li><strong>Feature:</strong> Implemented 0-latency Web Audio API synthesizers for piece movement, captures, and checks (no external MP3s required).</li>
-                    <li><strong>UI/UX:</strong> Introduced 4 real-time switchable color themes (Retro, Wood, Neon, Dark) using CSS root variables.</li>
-                    <li><strong>QoL:</strong> Added "Undo Move" functionality for both local and AI game modes.</li>
-                    <li><strong>Infrastructure:</strong> Implemented real-time visitor tracking via CounterAPI.</li>
-                </ul>
+    <main class="panel" style="max-width: 800px; margin: 0 auto; line-height: 1.6;">
+        <h2 class="panel-title">Development Change Log</h2>
+        
+        <div class="history-box" style="height: auto; max-height: 500px; padding: 15px;">
+            <h3>v2.0.0 - The Extreme Edition (August 2026)</h3>
+            <ul>
+                <li><strong>[NEW]</strong> Implemented visual Evaluation Bar with dynamic scaling.</li>
+                <li><strong>[NEW]</strong> Added Captured Pieces tracker (material advantage HUD).</li>
+                <li><strong>[NEW]</strong> Added 1-Click Lichess API Analysis integration.</li>
+                <li><strong>[NEW]</strong> FEN string input for custom position setups.</li>
+                <li><strong>[UPGRADE]</strong> Rewritten Stockfish Worker handling to completely prevent engine stalling during high-speed typing blitzes.</li>
+                <li><strong>[UI]</strong> Complete overhaul of the Windows 95 / Web 1.0 architecture with authentic CSS bevels.</li>
+            </ul>
 
-                <h3 style="color: var(--header-bg); border-bottom: 1px solid var(--border-dark); margin-top: 20px;">v1.0.0 (Initial Release)</h3>
-                <ul>
-                    <li><strong>Core:</strong> Established 0-bug standard FIDE move validation using chess.js (v0.10.3).</li>
-                    <li><strong>Feature:</strong> Algebraic typing (Blitz mode) input parser for keyboard-only play.</li>
-                    <li><strong>UI/UX:</strong> Windows 98 aesthetic interface with grid-based board rendering.</li>
-                    <li><strong>QoL:</strong> Real-time engine evaluation bar and PGN (Portable Game Notation) export functionality.</li>
-                </ul>
-            </div>
-        </section>
+            <hr style="border: 1px dashed #ccc; margin: 15px 0;">
+
+            <h3>v1.5.0 - Sound & Speed Update</h3>
+            <ul>
+                <li><strong>[NEW]</strong> Native Web Audio API implementation (Zero latency, no external sound files required).</li>
+                <li><strong>[UPGRADE]</strong> Upgraded SVG asset delivery for 4K displays.</li>
+                <li><strong>[FIX]</strong> Resolved a bug where auto-queening would occasionally reject valid FIDE algebraic typing.</li>
+            </ul>
+
+            <hr style="border: 1px dashed #ccc; margin: 15px 0;">
+
+            <h3>v1.0.0 - Initial Launch</h3>
+            <ul>
+                <li><strong>[RELEASE]</strong> Core Engine launched using Stockfish.js 10 and Chess.js.</li>
+                <li><strong>[FEATURE]</strong> FIDE Algebraic Typing interface implemented.</li>
+                <li><strong>[UI]</strong> Dark Mode, Wood Mode, and Retro Mode introduced.</li>
+            </ul>
+        </div>
     </main>
 
     <footer class="footer">
-        &copy; 2026 GM Chess. Accurate FIDE Move Validation.
+        &copy; 2026 GM Chess. All Rights Reserved.
     </footer>
 </body>
 </html>
