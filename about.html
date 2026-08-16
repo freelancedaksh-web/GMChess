@@ -2,55 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>About Us - GM Chess</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-retro">
     <header class="header">
-        <h1>GM Chess</h1>
-        <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+        <div class="header-content">
+            <div>
+                <h1>GM Chess</h1>
+                <p>The Ultimate 0-Bug Browser Engine for Blitz Typers & Grandmasters</p>
+            </div>
+        </div>
     </header>
     
+    <!-- Paste Global Nav Bar Here -->
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
+        <a href="https://github.com/userpuythonacsd/GMChess" target="_blank">GitHub</a>
     </nav>
 
-    <main class="main-container" style="justify-content: center;">
-        <section class="panel content-page" style="flex: 1; max-width: 800px;">
-            <h3 class="panel-title">About GM Chess Engine</h3>
-            
-            <div style="padding: 10px; line-height: 1.6; font-size: 14px;">
-                <p>Welcome to <strong>GM Chess</strong>, an uncompromising browser-based chess powerhouse engineered specifically for speed typers, competitive tournament players, and tactical purists.</p>
-                
-                <h4 style="margin-top: 20px; color: var(--header-bg);">Core Architecture & Philosophy</h4>
-                <p>Built using modern Web Workers and WebAssembly (WASM) technology, GM Chess embeds an independent Stockfish chess engine directly inside your client environment. This guarantees deep positional evaluation and grandmaster-level calculations without server roundtrip latency or browser thread stutter.</p>
-                
-                <ul style="margin-top: 15px; margin-bottom: 15px;">
-                    <li style="margin-bottom: 8px;">
-                        <b>Algebraic Blitz Typing:</b> Designed for keyboard-first operators who want to input standard FIDE notation (such as <code>e4</code>, <code>Nf3</code>, or castling via <code>O-O</code>) instantaneously.
-                    </li>
-                    <li style="margin-bottom: 8px;">
-                        <b>Strict Rule Validation:</b> Powered by battle-tested rule libraries guaranteeing zero illegal moves, precise handling of en passant captures, three-fold repetitions, and 50-rule draws.
-                    </li>
-                    <li>
-                        <b>Zero-Asset Synthesis:</b> Audio feedback is generated natively via the Web Audio API, eliminating network lag and external media buffering.
-                    </li>
-                </ul>
-                
-                <hr class="retro-hr">
-                
-                <p>Whether you are analyzing a complex endgame or warming up your tactical vision, GM Chess delivers a clean, lightning-fast environment built for high-performance play.</p>
-            </div>
-        </section>
+    <main class="panel" style="max-width: 800px; margin: 0 auto; line-height: 1.6;">
+        <h2 class="panel-title">About GM Chess</h2>
+        
+        <h3>The Vision</h3>
+        <p>GM Chess was built with a single goal in mind: to provide a blazingly fast, zero-lag environment for chess purists, blitz typers, and Grandmasters. In an era of bloated web applications, we are bringing back the raw, unfiltered aesthetic of the late 90s web, combined with cutting-edge 2026 WASM technology.</p>
+        
+        <h3>Under the Hood</h3>
+        <p>Powered by Stockfish 10 compiled to WebAssembly, GM Chess runs entirely locally in your browser. This means zero latency, no server-side bottlenecks, and absolute privacy. Our algebraic typing interface was strictly designed to handle FIDE notation flawlessly, ensuring competitive players can practice their blindfold and typing speed without interruption.</p>
+        
+        <hr class="retro-hr">
+        
+        <h3>Open Source & Community</h3>
+        <p>We believe in the open web. Our core board mechanics and UI architecture are available for review on our <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank" style="color: #0000ee;">GitHub repository</a>. Contributions, bug reports, and forks are always welcome.</p>
     </main>
 
     <footer class="footer">
-        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish Engine Powered.
+        &copy; 2026 GM Chess. All Rights Reserved.
     </footer>
 </body>
 </html>
