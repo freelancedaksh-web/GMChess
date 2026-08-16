@@ -472,7 +472,7 @@ function getSocketServerUrl() {
     if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
         return 'http://localhost:3000';
     }
-    return undefined; // default location.origin
+    return 'https://web-production-c939c.up.railway.app';
 }
 
 const modeSelect = document.getElementById('game-mode');
