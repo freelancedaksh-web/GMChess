@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GM Chess - The Ultimate Retro Engine</title>
     <!-- 0-Bug standard chess rule library via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
@@ -25,11 +25,12 @@
     <nav class="nav-bar">
         <a href="index.html">Play Game</a>
         <a href="about.html">About Us</a>
-        <a href="contact.html">Contact Us</a>
+        <a href="changelog.html">Change Log</a>
         <a href="terms.html">Terms of Service</a>
         <a href="privacy.html">Privacy Policy</a>
-        <a href="changelog.html">Change Log</a>
-        <a href="donate.html">Support Us ♥️</a>
+        <a href="github.html">Github</a>
+        <a href="contact.html">Contact us</a>
+        <a href="#" onclick="openDonateModal()">Support Us ♥️</a>
     </nav>
 
     <main class="main-container">
@@ -43,14 +44,14 @@
                     <option value="ai-master">Vs AI (Master)</option>
                     <option value="ai-club" selected>Vs AI (Club Player)</option>
                     <option value="ai-beginner">Vs AI (Beginner)</option>
-                    <option value="local">Local Multiplayer (Pass & Play)</option>
+                    <option value="local">Local Multiplayer</option>
                 </select>
             </div>
 
             <div class="control-group">
                 <label for="board-theme">Visual Theme:</label>
                 <select id="board-theme" onchange="changeTheme()">
-                    <option value="theme-retro" selected>Windows 98 (Retro)</option>
+                    <option value="theme-retro" selected>Windows 95 (Retro)</option>
                     <option value="theme-wood">Classic Wood</option>
                     <option value="theme-neon">Cyber Neon</option>
                     <option value="theme-dark">Midnight Dark</option>
@@ -73,11 +74,10 @@
             
             <hr class="retro-hr">
             
-            <h3 class="panel-title">Algebraic Typing (Blitz)</h3>
-            <p class="small-text">Type FIDE moves (e.g., e4, Nf3, O-O) and press Enter.</p>
+            <h3 class="panel-title">Position Setup (FEN)</h3>
             <div class="typing-container">
-                <input type="text" id="type-move" placeholder="Type move..." autocomplete="off">
-                <button onclick="submitTypedMove()">Go</button>
+                <input type="text" id="fen-input" placeholder="Paste FEN here..." autocomplete="off">
+                <button onclick="loadFEN()">Load</button>
             </div>
 
             <hr class="retro-hr">
@@ -87,34 +87,64 @@
             <div class="status-box status-turn" id="status">White to move</div>
         </aside>
 
-        <!-- Center: Board -->
+        <!-- Center: Board Area -->
         <section class="panel board-area">
-            <div class="board-wrapper">
-                <div id="board"></div>
+            <!-- Top Captured Pieces -->
+            <div id="captured-top" class="captured-pieces"></div>
+            
+            <div class="board-and-eval">
+                <!-- Visual Evaluation Bar -->
+                <div class="eval-bar-container">
+                    <div id="eval-fill" class="eval-fill"></div>
+                </div>
+                
+                <div class="board-wrapper">
+                    <div id="board"></div>
+                </div>
+            </div>
+
+            <!-- Bottom Captured Pieces -->
+            <div id="captured-bottom" class="captured-pieces"></div>
+            
+            <!-- Typing Interface moved below board for focus -->
+            <div class="typing-container blitz-typing" style="margin-top: 15px;">
+                <input type="text" id="type-move" placeholder="Type FIDE move (e.g. e4, Nf3)..." autocomplete="off">
+                <button onclick="submitTypedMove()">Enter</button>
             </div>
         </section>
 
-        <!-- Right Sidebar: History -->
+        <!-- Right Sidebar: History & Export -->
         <aside class="panel sidebar">
             <h3 class="panel-title">Move History (PGN)</h3>
             <div id="pgn" class="history-box"></div>
-            <button class="full-width-btn" onclick="downloadPGN()">Download PGN</button>
+            
+            <div class="button-group" style="margin-top: 10px;">
+                <button class="full-width-btn" onclick="downloadPGN()">Download PGN</button>
+                <button class="full-width-btn action-btn" onclick="analyzeOnLichess()">Analyze on Lichess</button>
+            </div>
+            
+            <!-- Hidden form for Lichess import -->
+            <form action="https://lichess.org/api/import" method="post" target="_blank" id="lichess-form" style="display:none;">
+                <input type="hidden" name="pgn" id="lichess-pgn">
+            </form>
         </aside>
     </main>
 
     <footer class="footer">
-        &copy; 2026 GM Chess. Accurate FIDE Move Validation. Stockfish 10 WASM Powered.
+        &copy; 2026 GM Chess. Stockfish 10 WASM Powered.
     </footer>
 
     <!-- Donation Modal -->
     <div id="donate-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3 class="panel-title" style="margin-top:0;">Support GM Chess</h3>
+            <div class="modal-header">
+                <h3 class="panel-title" style="margin:0;">Support GM Chess</h3>
+                <button class="close-btn" onclick="closeDonateModal()">X</button>
+            </div>
             <p>Your support helps maintain our servers, keep Stockfish running 24/7, and develop new features!</p>
             <div class="donate-buttons">
-                <button onclick="window.open('https://buymeacoffee.com/handedaksha', '_blank')">☕ Buy us a Coffee</button>
+                <button class="full-width-btn action-btn" onclick="window.open('https://buymeacoffee.com/', '_blank')">☕ Buy us a Coffee</button>
             </div>
-            <button class="full-width-btn" style="margin-top: 15px;" onclick="closeDonateModal()">Close</button>
         </div>
     </div>
 
