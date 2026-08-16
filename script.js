@@ -337,7 +337,7 @@ function loadFEN() {
 function triggerAI() {
     if (!engine) return;
     const mode = document.getElementById('game-mode').value;
-    if (mode === 'local' || mode === 'online-create' || mode === 'online-join') return;
+    if (mode === 'local' || mode.startsWith('online-')) return;
 
     let depth = '10', skill = '10';
     if (mode === 'ai-beginner') { depth = '5'; skill = '0'; }
@@ -356,7 +356,7 @@ function updateGameState() {
     checkStatus();
     
     const mode = document.getElementById('game-mode').value;
-    if (mode === 'online-create' || mode === 'online-join') return;
+    if (mode.startsWith('online-')) return;
 
     if (engine) engine.postMessage('stop'); 
     
@@ -463,10 +463,18 @@ let socket = null;
 let mpColor = null; // 'w' or 'b' — assigned side
 let mpRoomId = null;
 
+function getSocketServerUrl() {
+    if (typeof io === 'undefined') return null;
+    if (location.protocol === 'file:' || (location.port && location.port !== '3000')) {
+        return 'http://localhost:3000';
+    }
+    return undefined; // default location.origin
+}
+
 const modeSelect = document.getElementById('game-mode');
 modeSelect.addEventListener('change', function() {
     const mode = this.value;
-    if (mode === 'online-create' || mode === 'online-join') {
+    if (mode.startsWith('online-')) {
         initMultiplayer(mode);
     } else if (socket) {
         socket.disconnect();
@@ -478,14 +486,26 @@ modeSelect.addEventListener('change', function() {
 });
 
 function attachSocketListeners() {
+    socket.on('connect_error', (err) => {
+        const sUrl = getSocketServerUrl() || location.origin;
+        document.getElementById('mp-title').textContent = 'Server Connection Error';
+        document.getElementById('mp-status').textContent = 'Could not connect to multiplayer server at ' + sUrl + '. Please make sure server.js is running (run "node server.js").';
+        document.getElementById('mp-room-info').style.display = 'none';
+        document.getElementById('mp-overlay').style.display = '';
+    });
+
     socket.on('waitingForOpponent', ({ roomId }) => {
         if (roomId) {
             mpRoomId = roomId;
             document.getElementById('mp-room-id').textContent = roomId;
             document.getElementById('mp-room-info').style.display = '';
-            document.getElementById('mp-title').textContent = 'Create Room';
+            document.getElementById('mp-title').textContent = 'Room Created';
+            document.getElementById('mp-status').textContent = 'Share the Room ID or Link. Waiting for opponent to join\u2026';
+        } else {
+            document.getElementById('mp-title').textContent = 'Random Match';
+            document.getElementById('mp-status').textContent = 'Finding an online player\u2026';
+            document.getElementById('mp-room-info').style.display = 'none';
         }
-        document.getElementById('mp-status').textContent = 'Waiting for opponent\u2026';
         document.getElementById('mp-overlay').style.display = '';
     });
 
@@ -516,10 +536,19 @@ function attachSocketListeners() {
         mpColor = null;
     });
 
-    socket.on('error', (msg) => alert(msg));
+    socket.on('error', (msg) => {
+        alert(msg);
+        cancelMultiplayer();
+    });
 }
 
 function initMultiplayer(mode) {
+    if (typeof io === 'undefined') {
+        alert("Socket.IO library failed to load. Please check your internet connection.");
+        modeSelect.value = 'ai-club';
+        return;
+    }
+
     clearTimeout(analysisTimeout);
     if (engine) engine.postMessage('stop');
     isAiThinking = false;
@@ -528,7 +557,9 @@ function initMultiplayer(mode) {
         socket.disconnect();
         socket = null;
     }
-    socket = io();
+
+    const targetUrl = getSocketServerUrl();
+    socket = targetUrl ? io(targetUrl) : io();
     attachSocketListeners();
 
     mpColor = null;
@@ -537,9 +568,19 @@ function initMultiplayer(mode) {
 
     if (mode === 'online-create') {
         socket.emit('createRoom');
-    } else {
+    } else if (mode === 'online-join') {
+        const inputCode = prompt("Enter 6-character Room ID:");
+        if (!inputCode || !inputCode.trim()) {
+            cancelMultiplayer();
+            return;
+        }
+        document.getElementById('mp-title').textContent = 'Join Room';
+        document.getElementById('mp-status').textContent = 'Joining room ' + inputCode.trim().toUpperCase() + '\u2026';
+        document.getElementById('mp-overlay').style.display = '';
+        socket.emit('joinRoom', { roomId: inputCode.trim() });
+    } else if (mode === 'online-random') {
         document.getElementById('mp-title').textContent = 'Random Match';
-        document.getElementById('mp-status').textContent = 'Finding opponent\u2026';
+        document.getElementById('mp-status').textContent = 'Finding an online player\u2026';
         document.getElementById('mp-overlay').style.display = '';
         socket.emit('randomMatch');
     }
@@ -563,7 +604,7 @@ function copyRoomLink() {
 const _origHandleSquareClick = handleSquareClick;
 function handleSquareClick(sq) {
     const mode = document.getElementById('game-mode').value;
-    if (mode !== 'online-create' && mode !== 'online-join') {
+    if (!mode.startsWith('online-')) {
         return _origHandleSquareClick(sq);
     }
     if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
@@ -599,7 +640,7 @@ function handleSquareClick(sq) {
 const _origSubmitTypedMove = submitTypedMove;
 function submitTypedMove() {
     const mode = document.getElementById('game-mode').value;
-    if (mode !== 'online-create' && mode !== 'online-join') {
+    if (!mode.startsWith('online-')) {
         return _origSubmitTypedMove();
     }
     if (!mpColor || chess.game_over() || chess.turn() !== mpColor) return;
@@ -624,11 +665,13 @@ function submitTypedMove() {
     const roomId = new URLSearchParams(location.search).get('room');
     if (!roomId) return;
     modeSelect.value = 'online-create';
-    socket = io();
+    const targetUrl = getSocketServerUrl();
+    socket = targetUrl ? io(targetUrl) : io();
     attachSocketListeners();
     document.getElementById('mp-title').textContent = 'Join Room';
     document.getElementById('mp-status').textContent = 'Joining room ' + roomId + '\u2026';
     document.getElementById('mp-overlay').style.display = '';
     socket.emit('joinRoom', { roomId });
 })();
+
 

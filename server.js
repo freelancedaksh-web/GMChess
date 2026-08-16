@@ -5,7 +5,12 @@ const { Chess } = require('chess.js');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(__dirname));
@@ -39,13 +44,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('joinRoom', ({ roomId }) => {
-        const room = rooms[roomId];
-        if (!room) return socket.emit('error', 'Room not found.');
+        const cleanId = (roomId || '').trim().toUpperCase();
+        const room = rooms[cleanId];
+        if (!room) return socket.emit('error', 'Room not found. Please check the Room ID.');
         if (room.players.length >= 2) return socket.emit('error', 'Room is full.');
         room.players.push(socket.id);
-        socket.join(roomId);
-        socket.data.roomId = roomId;
-        startGame(roomId);
+        socket.join(cleanId);
+        socket.data.roomId = cleanId;
+        startGame(cleanId);
     });
 
     socket.on('randomMatch', () => {
