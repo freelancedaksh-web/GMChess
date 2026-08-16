@@ -465,7 +465,11 @@ let mpRoomId = null;
 
 function getSocketServerUrl() {
     if (typeof io === 'undefined') return null;
-    if (location.protocol === 'file:' || (location.port && location.port !== '3000')) {
+    const stored = localStorage.getItem('gmchess_server_url');
+    if (stored) return stored;
+    if (window.GMCHESS_SERVER_URL) return window.GMCHESS_SERVER_URL;
+
+    if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
         return 'http://localhost:3000';
     }
     return undefined; // default location.origin
@@ -489,9 +493,11 @@ function attachSocketListeners() {
     socket.on('connect_error', (err) => {
         const sUrl = getSocketServerUrl() || location.origin;
         document.getElementById('mp-title').textContent = 'Server Connection Error ⚠️';
-        document.getElementById('mp-status').textContent = 'Unable to connect to multiplayer server at ' + sUrl + '. Please make sure server.js is running (run "node server.js" in terminal).';
+        document.getElementById('mp-status').textContent = 'Unable to connect to multiplayer server at ' + sUrl + '. Make sure server.js is running ("node server.js"). You can also set a custom backend URL below:';
         document.getElementById('mp-room-info').style.display = 'none';
         document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-server-config').style.display = 'block';
+        document.getElementById('mp-server-url-input').value = getSocketServerUrl() || location.origin;
         document.getElementById('mp-retry-btn').style.display = 'inline-block';
         document.getElementById('mp-overlay').style.display = 'flex';
     });
@@ -510,6 +516,7 @@ function attachSocketListeners() {
             document.getElementById('mp-room-info').style.display = 'none';
             document.getElementById('mp-join-container').style.display = 'none';
         }
+        document.getElementById('mp-server-config').style.display = 'none';
         document.getElementById('mp-retry-btn').style.display = 'none';
         document.getElementById('mp-overlay').style.display = 'flex';
     });
@@ -537,6 +544,7 @@ function attachSocketListeners() {
         document.getElementById('mp-status').textContent = 'Opponent disconnected.';
         document.getElementById('mp-room-info').style.display = 'none';
         document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-server-config').style.display = 'none';
         document.getElementById('mp-title').textContent = 'Game Over';
         document.getElementById('mp-overlay').style.display = 'flex';
         mpColor = null;
@@ -576,6 +584,7 @@ function initMultiplayer(mode) {
         document.getElementById('mp-status').textContent = 'Connecting to multiplayer server...';
         document.getElementById('mp-room-info').style.display = 'none';
         document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-server-config').style.display = 'none';
         document.getElementById('mp-retry-btn').style.display = 'none';
         document.getElementById('mp-overlay').style.display = 'flex';
         socket.emit('createRoom');
@@ -584,6 +593,7 @@ function initMultiplayer(mode) {
         document.getElementById('mp-status').textContent = 'Enter the 6-character Room Code provided by your opponent:';
         document.getElementById('mp-room-info').style.display = 'none';
         document.getElementById('mp-join-container').style.display = 'block';
+        document.getElementById('mp-server-config').style.display = 'none';
         document.getElementById('mp-retry-btn').style.display = 'none';
         document.getElementById('mp-join-input').value = '';
         document.getElementById('mp-overlay').style.display = 'flex';
@@ -593,6 +603,7 @@ function initMultiplayer(mode) {
         document.getElementById('mp-status').textContent = 'Searching for an online player... Please wait.';
         document.getElementById('mp-room-info').style.display = 'none';
         document.getElementById('mp-join-container').style.display = 'none';
+        document.getElementById('mp-server-config').style.display = 'none';
         document.getElementById('mp-retry-btn').style.display = 'none';
         document.getElementById('mp-overlay').style.display = 'flex';
         socket.emit('randomMatch');
@@ -608,6 +619,25 @@ function submitJoinRoom() {
     document.getElementById('mp-status').textContent = 'Joining room ' + code + '\u2026';
     document.getElementById('mp-join-container').style.display = 'none';
     socket.emit('joinRoom', { roomId: code });
+}
+
+function toggleServerConfig() {
+    const cfgDiv = document.getElementById('mp-server-config');
+    const isHidden = cfgDiv.style.display === 'none';
+    cfgDiv.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+        document.getElementById('mp-server-url-input').value = localStorage.getItem('gmchess_server_url') || getSocketServerUrl() || location.origin;
+    }
+}
+
+function saveAndConnectCustomServer() {
+    const inputVal = document.getElementById('mp-server-url-input').value.trim();
+    if (inputVal) {
+        localStorage.setItem('gmchess_server_url', inputVal);
+    } else {
+        localStorage.removeItem('gmchess_server_url');
+    }
+    retryMultiplayerConnection();
 }
 
 function retryMultiplayerConnection() {

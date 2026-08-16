@@ -180,9 +180,19 @@
                     </div>
                 </div>
 
+                <!-- Server URL Configuration Form (shows on connection error or settings click) -->
+                <div id="mp-server-config" style="display:none; margin-bottom:15px; text-align:left;">
+                    <label style="font-size:12px; font-weight:bold; margin-bottom:4px; display:block;">Server URL (Backend):</label>
+                    <div class="typing-container">
+                        <input type="text" id="mp-server-url-input" placeholder="e.g. http://localhost:3000 or https://your-server.com" autocomplete="off" style="font-size:12px;">
+                        <button onclick="saveAndConnectCustomServer()" class="action-btn">Save & Connect</button>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
-                <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
+                <div style="margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     <button id="mp-retry-btn" onclick="retryMultiplayerConnection()" style="display:none;" class="action-btn">Retry Connection</button>
+                    <button id="mp-config-toggle-btn" onclick="toggleServerConfig()" style="font-size:11px;">Server Settings</button>
                     <button id="mp-cancel-btn" onclick="cancelMultiplayer()">Cancel / Exit</button>
                 </div>
             </div>
